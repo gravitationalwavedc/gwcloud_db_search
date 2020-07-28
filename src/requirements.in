@@ -1,0 +1,14 @@
+django<3
+graphene-django
+pip-tools
+django-filter
+django-cors-headers
+django-graphql-jwt
+python-jwt
+requests
+django-jenkins
+pep8
+pyflakes
+flake8
+coverage<5
+mysql-connector-python

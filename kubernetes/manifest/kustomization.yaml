@@ -1,0 +1,5 @@
+resources:
+  - gwcloud_db_search_django_deployment.yaml
+  - gwcloud_db_search_django_service.yaml
+  - gwcloud_db_search_nginx_deployment.yaml
+  - gwcloud_db_search_nginx_service.yaml

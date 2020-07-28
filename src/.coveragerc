@@ -1,0 +1,17 @@
+[run]
+omit =
+    # Omit the virtual env
+    */venv/*
+
+    # Ignore manage.py files
+    ./*manage.py
+
+    # Ignore settings.py files
+    gw_db_search/*settings.py
+
+    # Ignore local.py if one exists
+    gw_db_search/local.py
+
+    # Ignore environment and base settings
+    gw_db_search/base.py
+    gw_db_search/environment.py

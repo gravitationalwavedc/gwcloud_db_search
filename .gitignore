@@ -1,0 +1,8 @@
+*.pyc
+.idea
+venv
+.venv
+db.sqlite3
+local.py
+.coverage
+.DS_Store
