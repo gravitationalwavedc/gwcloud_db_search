@@ -1,4 +1,7 @@
 {
-     "load": ["arcutils"],
-     "unit.engine": "DjangoUnitTestEngine"
+	"load": ["arcutils"],
+	"unit.engine": "DjangoUnitTestEngine",
+	"unit.engine.django.manage_py_dir": "src",
+        "unit.engine.django.manage_py_file": "development-manage.py",
+        "unit.engine.django.coverage": true
 }
