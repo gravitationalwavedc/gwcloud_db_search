@@ -1,3 +1,12 @@
 [submodule "arcutils"]
-	path = arcutils
-	url = https://github.com/gravitationalwavedc/gw_arcanist_library.git
+        path = arcutils
+        url = https://github.com/gravitationalwavedc/gw_arcanist_library.git
+[submodule "src/apps/gwcloud_bilby"]
+	path = src/apps/gwcloud_bilby
+	url = https://github.com/gravitationalwavedc/gwcloud_bilby.git
+[submodule "src/apps/gwcloud_job_server"]
+	path = src/apps/gwcloud_job_server
+	url = https://github.com/gravitationalwavedc/gwcloud_job_server.git
+[submodule "src/apps/gwcloud_auth"]
+	path = src/apps/gwcloud_auth
+	url = https://github.com/gravitationalwavedc/gwcloud_auth.git

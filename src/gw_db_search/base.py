@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -47,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'querycount.middleware.QueryCountMiddleware'
 ]
 
 ROOT_URLCONF = 'gw_db_search.urls'
@@ -73,30 +75,42 @@ WSGI_APPLICATION = 'gw_db_search.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {},
-    'gwcloud_auth': {
-        'ENGINE': 'mysql.connector.django',
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3'
+    },
+    'gwauth': {
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_auth',
         'HOST': 'localhost',
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
+        'TEST': {
+            'NAME': 'test_gwcloud_auth',
+        },
     },
-    'gwcloud_bilby': {
-        'ENGINE': 'mysql.connector.django',
+    'bilby': {
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_bilby',
         'HOST': 'localhost',
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
+        'TEST': {
+            'NAME': 'test_gwcloud_bilby',
+        },
     },
-    'gwcloud_jobcontroller': {
-        'ENGINE': 'mysql.connector.django',
+    'jobserver': {
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_jobcontroller',
         'HOST': 'localhost',
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
+        'TEST': {
+            'NAME': 'test_gwcloud_jobcontroller',
+        },
     },
 }
 
@@ -163,9 +177,16 @@ GRAPHQL_JWT = {
     'JWT_VERIFY_EXPIRATION': True
 }
 
-GWCLOUD_APP_MODELS = {
-    'auth': 'https://github.com/gravitationalwavedc/gwcloud_auth/blob/master/src/gwauth/models.py',
-    'bilby': 'https://raw.githubusercontent.com/gravitationalwavedc/gwcloud_bilby/master/src/bilby/models.py',
-    'jobserver':
-        'https://github.com/gravitationalwavedc/gwcloud_job_server/blob/master/src/utils/schema/jobserver/models.py'
+AUTH_USER_MODEL = 'gwauth.GWCloudUser'
+
+GWCLOUD_APPS = {
+    'gwauth': 'apps/gwcloud_auth/src/',
+    'bilby': 'apps/gwcloud_bilby/src/',
+    'jobserver': 'apps/gwcloud_job_server/src/utils/schema/'
 }
+
+for module, path in GWCLOUD_APPS.items():
+    sys.path.append(path)
+    INSTALLED_APPS.append(module)
+
+TESTING = False

@@ -11,4 +11,5 @@ pep8
 pyflakes
 flake8
 coverage<5
-mysql-connector-python
+
+django-querycount

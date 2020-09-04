@@ -65,3 +65,22 @@ class JobStatus:
             return 'Completed'
         else:
             return 'Unknown'
+
+    @staticmethod
+    def all():
+        return [
+            JobStatus.DRAFT,
+            JobStatus.PENDING,
+            JobStatus.SUBMITTING,
+            JobStatus.SUBMITTED,
+            JobStatus.QUEUED,
+            JobStatus.RUNNING,
+            JobStatus.CANCELLING,
+            JobStatus.CANCELLED,
+            JobStatus.DELETING,
+            JobStatus.DELETED,
+            JobStatus.ERROR,
+            JobStatus.WALL_TIME_EXCEEDED,
+            JobStatus.OUT_OF_MEMORY,
+            JobStatus.COMPLETED
+        ]
