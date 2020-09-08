@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'db_search.apps.DbSearchConfig',
     'graphene_django',
     'django_jenkins'

@@ -6,8 +6,10 @@ COPY src /src
 COPY ./runserver.sh /runserver.sh
 RUN chmod +x /runserver.sh
 
+# Install dependencies
+RUN apt-get update && apt-get install -y python-virtualenv build-essential python3-dev default-libmysqlclient-dev
+
 # Create python virtualenv
-RUN rm -Rf /src/venv
 RUN virtualenv -p python3 /src/venv
 
 # Activate and install the django requirements (mysqlclient requires python3-dev and build-essential)
