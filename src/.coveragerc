@@ -15,3 +15,6 @@ omit =
     # Ignore environment and base settings
     gw_db_search/base.py
     gw_db_search/environment.py
+
+    # Ignore dependent applications
+    ./apps/*

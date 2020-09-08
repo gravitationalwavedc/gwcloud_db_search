@@ -190,3 +190,6 @@ for module, path in GWCLOUD_APPS.items():
     INSTALLED_APPS.append(module)
 
 TESTING = False
+
+# The maximum number of results to return from the graphql endpoint
+GRAPHENE_RESULTS_LIMIT = 100

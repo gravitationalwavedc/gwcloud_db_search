@@ -83,15 +83,15 @@ def job_search_single_term(term, end_time, valid_states):
     return [job.id for job in qs]
 
 
-def job_search(terms, end_time, order_by, skip, first):
+def job_search(terms, end_time, order_by, first, count):
     """
     Searches for jobs by a list of terms
 
     :param terms: The list of terms to search on
     :param end_time: Jobs that have finished after this time
     :param order_by: Order by field
-    :param skip: Result start offset
-    :param first: Number of results to return
+    :param first: Result start offset
+    :param count: Number of results to return
     :return: A list of job "objects" that contain information about the bilby job
     """
 
@@ -135,11 +135,11 @@ def job_search(terms, end_time, order_by, skip, first):
 
     # Todo: Sort
 
-    if skip:
-        jobs = jobs[skip:]
-
     if first:
-        jobs = jobs[:first]
+        jobs = jobs[first:]
+
+    if count:
+        jobs = jobs[:count]
 
     # Store the jobs in a dictionary by job id
     jobs = {job.job_id: job for job in jobs}
