@@ -3,19 +3,9 @@ version: '3'
 services:
   django:
     build:
-      dockerfile: ./docker/gwcloud_db_search_django.Dockerfile
+      dockerfile: ./docker/gwcloud_db_search.Dockerfile
       context: .
-    image: nexus.gw-cloud.org/docker/gwcloud_db_search_django:0.1
-    container_name: gwcloud_db_search_django
+    image: nexus.gw-cloud.org/docker/gwcloud_db_search:0.1
+    container_name: gwcloud_db_search
     ports:
       - "8000"
-  nginx:
-    build:
-      dockerfile: ./docker/gwcloud_db_search_nginx.Dockerfile
-      context: .
-    image: nexus.gw-cloud.org/docker/gwcloud_db_search_nginx:0.1
-    container_name: gwcloud_db_search_nginx
-    ports:
-      - "8000:8000"
-    depends_on:
-      - django

@@ -3,15 +3,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gwcloud-db-search-django
+  name: gwcloud-db-search
   namespace: gwcloud
   labels:
-    name: gwcloud-db-search-django
+    name: gwcloud-db-search
 spec:
   replicas: 1
   selector:
     matchLabels:
-        name: gwcloud-db-search-django
+        name: gwcloud-db-search
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -20,7 +20,7 @@ spec:
   template:
     metadata:
       labels:
-        name: gwcloud-db-search-django
+        name: gwcloud-db-search
     spec:
       containers:
         - envFrom:
@@ -28,8 +28,8 @@ spec:
                 name: db-search
             - secretRef:
                 name: common
-          name: gwcloud-db-search-django
-          image: nexus.gw-cloud.org/docker/gwcloud_db_search_django:0.1
+          name: gwcloud-db-search
+          image: nexus.gw-cloud.org/docker/gwcloud_db_search:0.1
           ports:
             - name: http
               containerPort: 8000
