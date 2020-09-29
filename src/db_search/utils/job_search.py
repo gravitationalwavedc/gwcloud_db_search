@@ -18,8 +18,7 @@ WHERE
             FROM
                 {gwcloud_auth}.gwauth_gwclouduser
             WHERE
-                username LIKE %(term)s
-                OR first_name LIKE %(term)s
+                first_name LIKE %(term)s
                 OR last_name LIKE %(term)s
         )
         OR {gwcloud_bilby}.bilby_bilbyjob.name LIKE %(term)s

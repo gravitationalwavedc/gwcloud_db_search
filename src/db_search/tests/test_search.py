@@ -26,15 +26,15 @@ class TestSearch(SimpleTestCase):
 
         # Insert users
         self.user_1 = GWCloudUser.objects.using('gwauth').create(
-            username='user1_magenta',
+            username='user1',
             first_name='User',
-            last_name='One'
+            last_name='One magenta'
         )
 
         self.user_2 = GWCloudUser.objects.using('gwauth').create(
-            username='user2_yellow',
-            first_name='Another',
-            last_name='Two'
+            username='user2',
+            first_name='Another User',
+            last_name='Two yellow'
         )
 
         # Insert jobs

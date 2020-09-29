@@ -31,7 +31,7 @@ class TestQueriesCustom(CustomJwtTestCase):
         # Insert users
         self.user_1 = GWCloudUser.objects.using('gwauth').create(
             username='user1_magenta',
-            first_name='User',
+            first_name='User magenta',
             last_name='One'
         )
 
@@ -39,8 +39,8 @@ class TestQueriesCustom(CustomJwtTestCase):
 
         self.user_2 = GWCloudUser.objects.using('gwauth').create(
             username='user2_yellow',
-            first_name='Another',
-            last_name='Two'
+            first_name='Another User',
+            last_name='Two yellow'
         )
 
         # Insert jobs
@@ -71,7 +71,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user': {
                 'id': str(self.user_1.id),
                 'username': 'user1_magenta',
-                'firstName': 'User',
+                'firstName': 'User magenta',
                 'lastName': 'One',
                 'email': '',
                 'isLigoUser': False
@@ -133,8 +133,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user': {
                 'id': str(self.user_2.id),
                 'username': 'user2_yellow',
-                'firstName': 'Another',
-                'lastName': 'Two',
+                'firstName': 'Another User',
+                'lastName': 'Two yellow',
                 'email': '',
                 'isLigoUser': False
             },
@@ -195,8 +195,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user': {
                 'id': str(self.user_2.id),
                 'username': 'user2_yellow',
-                'firstName': 'Another',
-                'lastName': 'Two',
+                'firstName': 'Another User',
+                'lastName': 'Two yellow',
                 'email': '',
                 'isLigoUser': False
             },
@@ -341,8 +341,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user': {
                 'id': str(self.user_2.id),
                 'username': 'user2_yellow',
-                'firstName': 'Another',
-                'lastName': 'Two',
+                'firstName': 'Another User',
+                'lastName': 'Two yellow',
                 'email': '',
                 'isLigoUser': False
             },
