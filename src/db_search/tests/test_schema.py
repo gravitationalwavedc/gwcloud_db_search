@@ -1,12 +1,13 @@
 import datetime
 
 import graphene
-from bilby.models import BilbyJob
 from django.contrib.auth import get_user_model
 from django.test import override_settings
 from django.utils import timezone
 from gwauth.models import GWCloudUser
 from jobserver.models import JobHistory, Job
+from bilby.models import BilbyJob
+from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
 from db_search.tests.testcases import CustomJwtTestCase
@@ -27,9 +28,11 @@ class TestQueriesCustom(CustomJwtTestCase):
         Job.objects.using('jobserver').all().delete()
         JobHistory.objects.using('jobserver').all().delete()
         BilbyJob.objects.using('bilby').all().delete()
+        ViterbiJob.objects.using('viterbi').all().delete()
 
         # Insert users
         self.user_1 = GWCloudUser.objects.using('gwauth').create(
+            email='user1@example.com',
             username='user1_magenta',
             first_name='User magenta',
             last_name='One'
@@ -38,6 +41,7 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.client.authenticate(self.user_1)
 
         self.user_2 = GWCloudUser.objects.using('gwauth').create(
+            email='user2@example.com',
             username='user2_yellow',
             first_name='Another User',
             last_name='Two yellow'
@@ -49,7 +53,8 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.job_controller_job_completed = Job.objects.using('jobserver').create(
             user=self.user_1.id,
             cluster="test_cluster",
-            bundle="test_bundle"
+            bundle="test_bundle",
+            application='bilby'
         )
 
         self.job_controller_job_completed_history1 = JobHistory.objects.using('jobserver').create(
@@ -73,7 +78,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'username': 'user1_magenta',
                 'firstName': 'User magenta',
                 'lastName': 'One',
-                'email': '',
+                'email': 'user1@example.com',
                 'isLigoUser': False
             },
             'job': {
@@ -99,7 +104,8 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.job_controller_job_completed2 = Job.objects.using('jobserver').create(
             user=self.user_2.id,
             cluster="test_cluster",
-            bundle="test_bundle"
+            bundle="test_bundle",
+            application='bilby'
         )
 
         self.job_controller_job_completed2_history1 = JobHistory.objects.using('jobserver').create(
@@ -135,7 +141,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'username': 'user2_yellow',
                 'firstName': 'Another User',
                 'lastName': 'Two yellow',
-                'email': '',
+                'email': 'user2@example.com',
                 'isLigoUser': False
             },
             'job': {
@@ -173,7 +179,8 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.job_controller_job_incomplete = Job.objects.using('jobserver').create(
             user=self.user_2.id,
             cluster="test_cluster",
-            bundle="test_bundle"
+            bundle="test_bundle",
+            application='bilby'
         )
 
         self.job_controller_job_incomplete_history1 = JobHistory.objects.using('jobserver').create(
@@ -197,7 +204,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'username': 'user2_yellow',
                 'firstName': 'Another User',
                 'lastName': 'Two yellow',
-                'email': '',
+                'email': 'user2@example.com',
                 'isLigoUser': False
             },
             'job': {
@@ -223,7 +230,8 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.job_controller_job_error = Job.objects.using('jobserver').create(
             user=self.user_1.id,
             cluster="test_cluster",
-            bundle="test_bundle"
+            bundle="test_bundle",
+            application='bilby'
         )
 
         self.job_controller_job_error_history1 = JobHistory.objects.using('jobserver').create(
@@ -257,7 +265,8 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.job_controller_job_error2 = Job.objects.using('jobserver').create(
             user=self.user_2.id,
             cluster="test_cluster",
-            bundle="test_bundle"
+            bundle="test_bundle",
+            application='bilby'
         )
 
         self.job_controller_job_error2_history1 = JobHistory.objects.using('jobserver').create(
@@ -315,7 +324,8 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.job_controller_job_completed_old = Job.objects.using('jobserver').create(
             user=self.user_2.id,
             cluster="test_cluster",
-            bundle="test_bundle"
+            bundle="test_bundle",
+            application='bilby'
         )
 
         self.job_controller_job_completed_old_history1 = JobHistory.objects.using('jobserver').create(
@@ -336,6 +346,58 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.bilby_job_completed_result_old = None
         self.update_old_result()
 
+        self.job_controller_job_completed_viterbi = Job.objects.using('jobserver').create(
+            user=self.user_1.id,
+            cluster="test_cluster",
+            bundle="test_bundle",
+            application='viterbi'
+        )
+
+        self.job_controller_job_completed_history1_viterbi = JobHistory.objects.using('jobserver').create(
+            job=self.job_controller_job_completed_viterbi,
+            what='_job_completion_',
+            state=JobStatus.COMPLETED,
+            timestamp=timezone.now()
+        )
+
+        self.job_completed_viterbi = ViterbiJob.objects.using('viterbi').create(
+            user_id=self.job_controller_job_completed_viterbi.user,
+            job_id=self.job_controller_job_completed_viterbi.id,
+            name="test_job_viterbi",
+            description="my potato job is brown_viterbi",
+            private=False
+        )
+
+        self.job_completed_result_viterbi = {
+            'user': {
+                'id': str(self.user_1.id),
+                'username': 'user1_magenta',
+                'firstName': 'User magenta',
+                'lastName': 'One',
+                'email': 'user1@example.com',
+                'isLigoUser': False
+            },
+            'job': {
+                'id': str(self.job_completed_viterbi.id),
+                'userId': self.job_completed_viterbi.user_id,
+                'name': 'test_job_viterbi',
+                'description': 'my potato job is brown_viterbi',
+                'creationTime': graphene.DateTime().serialize(self.job_completed_viterbi.creation_time),
+                'lastUpdated': graphene.DateTime().serialize(self.job_completed_viterbi.last_updated),
+                'private': False,
+                'jobId': self.job_completed_viterbi.job_id
+            },
+            'history': [{
+                'id': str(self.job_controller_job_completed_history1_viterbi.id),
+                'timestamp': graphene.DateTime().serialize(
+                    self.job_controller_job_completed_history1_viterbi.timestamp
+                ),
+                'what': '_job_completion_',
+                'state': 500,
+                'details': ''
+            }]
+        }
+
     def update_old_result(self):
         self.bilby_job_completed_result_old = {
             'user': {
@@ -343,7 +405,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'username': 'user2_yellow',
                 'firstName': 'Another User',
                 'lastName': 'Two yellow',
-                'email': '',
+                'email': 'user2@example.com',
                 'isLigoUser': False
             },
             'job': {
@@ -646,7 +708,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-    def run_terms(self, terms, expected):
+    def run_terms_bilby(self, terms, expected):
         response = self.client.execute(
             f"""
                 query {{
@@ -685,8 +747,47 @@ class TestQueriesCustom(CustomJwtTestCase):
             expected, response.data, "publicBilbyJobs query returned unexpected data."
         )
 
+    def run_terms_viterbi(self, terms, expected):
+        response = self.client.execute(
+            f"""
+                query {{
+                  publicViterbiJobs (search: "{terms}") {{
+                    user {{
+                      id
+                      username
+                      firstName
+                      lastName
+                      email
+                      isLigoUser
+                    }}
+                    job {{
+                      id
+                      userId
+                      name
+                      description
+                      creationTime
+                      lastUpdated
+                      private
+                      jobId
+                    }}
+                    history {{
+                      id
+                      timestamp
+                      what
+                      state
+                      details
+                    }}
+                  }}
+                }}
+            """
+        )
+
+        self.assertDictEqual(
+            expected, response.data, "publicViterbiJobs query returned unexpected data."
+        )
+
     def test_single_term(self):
-        self.run_terms(
+        self.run_terms_bilby(
             'magenta',
             {
                 'publicBilbyJobs': [
@@ -695,7 +796,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'yellow',
             {
                 'publicBilbyJobs': [
@@ -705,7 +806,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'cyan',
             {
                 'publicBilbyJobs': [
@@ -714,7 +815,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'user',
             {
                 'publicBilbyJobs': [
@@ -725,8 +826,17 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
+        self.run_terms_viterbi(
+            'magenta',
+            {
+                'publicViterbiJobs': [
+                    self.job_completed_result_viterbi
+                ]
+            }
+        )
+
     def test_multiple_terms(self):
-        self.run_terms(
+        self.run_terms_bilby(
             'user yellow',
             {
                 'publicBilbyJobs': [
@@ -736,7 +846,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'user yellow',
             {
                 'publicBilbyJobs': [
@@ -746,7 +856,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'user yellow test',
             {
                 'publicBilbyJobs': [
@@ -756,7 +866,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'user yellow test purple',
             {
                 'publicBilbyJobs': [
@@ -765,7 +875,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'user yellow test purple cyan',
             {
                 'publicBilbyJobs': [
@@ -774,7 +884,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             }
         )
 
-        self.run_terms(
+        self.run_terms_bilby(
             'user yellow test purple cyan magenta',
             {
                 'publicBilbyJobs': [

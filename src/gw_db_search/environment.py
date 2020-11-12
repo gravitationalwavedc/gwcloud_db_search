@@ -19,6 +19,14 @@ DATABASES = {
         'PORT': 3306,
         'PASSWORD': MYSQL_PASSWORD,
     },
+    'jobserver': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'gwcloud_jobcontroller',
+        'HOST': MYSQL_HOST,
+        'USER': MYSQL_USER,
+        'PORT': 3306,
+        'PASSWORD': MYSQL_PASSWORD,
+    },
     'bilby': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_bilby',
@@ -27,9 +35,9 @@ DATABASES = {
         'PORT': 3306,
         'PASSWORD': MYSQL_PASSWORD,
     },
-    'jobserver': {
+    'viterbi': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gwcloud_jobcontroller',
+        'NAME': 'gwlab_viterbi',
         'HOST': MYSQL_HOST,
         'USER': MYSQL_USER,
         'PORT': 3306,

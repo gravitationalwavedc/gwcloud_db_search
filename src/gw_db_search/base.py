@@ -89,6 +89,17 @@ DATABASES = {
             'NAME': 'test_gwcloud_auth',
         },
     },
+    'jobserver': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'gwcloud_jobcontroller',
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PORT': 3306,
+        'PASSWORD': 'root',
+        'TEST': {
+            'NAME': 'test_gwcloud_jobcontroller',
+        },
+    },
     'bilby': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_bilby',
@@ -100,15 +111,15 @@ DATABASES = {
             'NAME': 'test_gwcloud_bilby',
         },
     },
-    'jobserver': {
+    'viterbi': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gwcloud_jobcontroller',
+        'NAME': 'gwlab_viterbi',
         'HOST': 'localhost',
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
         'TEST': {
-            'NAME': 'test_gwcloud_jobcontroller',
+            'NAME': 'test_gwlab_viterbi',
         },
     },
 }
@@ -180,8 +191,9 @@ AUTH_USER_MODEL = 'gwauth.GWCloudUser'
 
 GWCLOUD_APPS = {
     'gwauth': 'apps/gwcloud_auth/src/',
+    'jobserver': 'apps/gwcloud_job_server/src/utils/schema/',
     'bilby': 'apps/gwcloud_bilby/src/',
-    'jobserver': 'apps/gwcloud_job_server/src/utils/schema/'
+    'viterbi': 'apps/gwlab_viterbi/src/'
 }
 
 for module, path in GWCLOUD_APPS.items():

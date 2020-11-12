@@ -10,3 +10,6 @@
 [submodule "src/apps/gwcloud_auth"]
 	path = src/apps/gwcloud_auth
 	url = https://github.com/gravitationalwavedc/gwcloud_auth.git
+[submodule "src/apps/gwlab_viterbi"]
+	path = src/apps/gwlab_viterbi
+	url = https://github.com/gravitationalwavedc/gwlab-viterbi-cw.git

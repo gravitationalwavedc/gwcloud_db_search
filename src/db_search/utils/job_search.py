@@ -1,7 +1,8 @@
-from bilby.models import BilbyJob
 from django.conf import settings
 from gwauth.models import GWCloudUser
 from jobserver.models import JobHistory
+from bilby.models import BilbyJob
+from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
 
@@ -9,7 +10,7 @@ sql_term_search = """
 SELECT
     id
 FROM
-    {gwcloud_bilby}.bilby_bilbyjob
+    {job_database}
 WHERE
     (
         user_id IN (
@@ -21,8 +22,8 @@ WHERE
                 first_name LIKE %(term)s
                 OR last_name LIKE %(term)s
         )
-        OR {gwcloud_bilby}.bilby_bilbyjob.name LIKE %(term)s
-        OR {gwcloud_bilby}.bilby_bilbyjob.description LIKE %(term)s
+        OR {job_database}.name LIKE %(term)s
+        OR {job_database}.description LIKE %(term)s
     )
     AND job_id in (
         SELECT
@@ -44,54 +45,81 @@ WHERE
                 ORDER BY {gwcloud_jobcontroller}.jobserver_jobhistory.timestamp DESC
                 LIMIT 1
             ) in %(valid_states)s
+            AND application = %(application)s
     )
-    AND {gwcloud_bilby}.bilby_bilbyjob.private = FALSE
+    AND {job_database}.private = FALSE
 """
 
 
-def job_search_single_term(term, end_time, valid_states):
+def job_search_single_term(application, job_klass, term, end_time, valid_states):
+    """
+    Performs a database search for all jobs matching:-
+        * the specified single word term
+        * between now until end time
+        * the specified job states
+
+    :param application: The application to perform the search on, ie, "viterbi" or "bilby"
+    :param job_klass: The class representing the main job class for the provided application, ie, BilbyJob or ViterbiJob
+    :param term: The single word term to filter on
+    :param end_time: Jobs that have finished or updated up until this time will be considered
+    :param valid_states: An array of job states to filter on
+
+    :return: A list of job IDs representing the matched jobs
+    """
     # We need to use the correct database names for testing
     if settings.TESTING:
         db_dict = \
             {
                 'gwcloud_auth': settings.DATABASES['gwauth']['TEST']['NAME'],
-                'gwcloud_bilby': settings.DATABASES['bilby']['TEST']['NAME'],
                 'gwcloud_jobcontroller': settings.DATABASES['jobserver']['TEST']['NAME'],
             }
+
+        if application == 'bilby':
+            db_dict['job_database'] = settings.DATABASES['bilby']['TEST']['NAME'] + '.bilby_bilbyjob'
+        elif application == 'viterbi':
+            db_dict['job_database'] = settings.DATABASES['viterbi']['TEST']['NAME'] + '.viterbi_viterbijob'
     else:
         db_dict = \
             {
                 'gwcloud_auth': settings.DATABASES['gwauth']['NAME'],
-                'gwcloud_bilby': settings.DATABASES['bilby']['NAME'],
                 'gwcloud_jobcontroller': settings.DATABASES['jobserver']['NAME'],
             }
 
+        if application == 'bilby':
+            db_dict['job_database'] = settings.DATABASES['bilby']['NAME'] + '.bilby_bilbyjob'
+        elif application == 'viterbi':
+            db_dict['job_database'] = settings.DATABASES['viterbi']['NAME'] + '.viterbi_viterbijob'
+
+    # Format the database query
     sql_term_search_prepared = sql_term_search.format_map(db_dict)
 
     # Process the query for this term
-    qs = BilbyJob.objects.using('bilby').raw(
+    qs = job_klass.objects.using(application).raw(
         sql_term_search_prepared,
         {
             'term': f'%{term}%',
             'end_time': end_time,
-            'valid_states': valid_states
+            'valid_states': valid_states,
+            'application': application
         }
     )
 
-    # Convert the query to a list of BilbyJob ID's and return
+    # Convert the query to a list of Job IDs and return
     return [job.id for job in qs]
 
 
-def job_search(terms, end_time, order_by, first, count):
+def job_search(application, terms, end_time, order_by, first, count):
     """
     Searches for jobs by a list of terms
 
+    :param application: The application to perform the search on, ie, "viterbi" or "bilby"
     :param terms: The list of terms to search on
     :param end_time: Jobs that have finished after this time
     :param order_by: Order by field
     :param first: Result start offset
     :param count: Number of results to return
-    :return: A list of job "objects" that contain information about the bilby job
+
+    :return: A list of job "objects" that contain information about the matched jobs
     """
 
     # Always include completed or running jobs
@@ -112,6 +140,13 @@ def job_search(terms, end_time, order_by, first, count):
         JobStatus.COMPLETED
     ]
 
+    # Get the job class
+    job_klass = None
+    if application == 'bilby':
+        job_klass = BilbyJob
+    elif application == 'viterbi':
+        job_klass = ViterbiJob
+
     # Prevent "use before define" warning
     jobs = None
 
@@ -120,17 +155,17 @@ def job_search(terms, end_time, order_by, first, count):
         for idx, term in enumerate(terms):
             if idx == 0:
                 # If this is the first term, create the initial set of job ids
-                jobs = set(job_search_single_term(term, end_time, states))
+                jobs = set(job_search_single_term(application, job_klass, term, end_time, states))
             else:
                 # Otherwise intersect the set of job ids, such that the new term is contained in the results from the
                 # previous search. (Every term must exist in each result)
-                jobs = jobs.intersection(job_search_single_term(term, end_time, states))
+                jobs = jobs.intersection(job_search_single_term(application, job_klass, term, end_time, states))
     else:
-        # If there are no terms, this query will be used which returns all bilby jobs
-        jobs = job_search_single_term('', end_time, states)
+        # If there are no terms, this query will be used which returns all jobs
+        jobs = job_search_single_term(application, job_klass, '', end_time, states)
 
     # Next we filter by range count
-    jobs = BilbyJob.objects.using('bilby').filter(id__in=jobs)
+    jobs = job_klass.objects.using(application).filter(id__in=jobs)
 
     # Todo: Sort
 

@@ -1,13 +1,14 @@
 import datetime
 
 import graphene
-from bilby.models import BilbyJob
 from django.conf import settings
 from django.utils import timezone
 from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from gwauth.models import GWCloudUser
 from jobserver.models import JobHistory
+from bilby.models import BilbyJob
+from viterbi.models import ViterbiJob
 
 from db_search.utils.job_search import job_search
 
@@ -18,19 +19,30 @@ class UserNode(DjangoObjectType):
         fields = ("id", "username", "first_name", "last_name", "email", "is_ligo_user")
 
 
-class BilbyJobNode(DjangoObjectType):
-    class Meta:
-        model = BilbyJob
-
-
 class JobHistoryNode(DjangoObjectType):
     class Meta:
         model = JobHistory
 
 
+class BilbyJobNode(DjangoObjectType):
+    class Meta:
+        model = BilbyJob
+
+
 class BilbyPublicJob(graphene.ObjectType):
     user = graphene.Field(UserNode)
     job = graphene.Field(BilbyJobNode)
+    history = graphene.List(JobHistoryNode)
+
+
+class ViterbiJobNode(DjangoObjectType):
+    class Meta:
+        model = ViterbiJob
+
+
+class ViterbiPublicJob(graphene.ObjectType):
+    user = graphene.Field(UserNode)
+    job = graphene.Field(ViterbiJobNode)
     history = graphene.List(JobHistoryNode)
 
 
@@ -43,8 +55,16 @@ class Query(object):
         count=graphene.Int()
     )
 
-    @login_required
-    def resolve_public_bilby_jobs(self, info, **kwargs):
+    public_viterbi_jobs = graphene.List(
+        ViterbiPublicJob,
+        search=graphene.String(),
+        time_range=graphene.String(),
+        first=graphene.Int(),
+        count=graphene.Int()
+    )
+
+    @staticmethod
+    def perform_search(klass, application, info, **kwargs):
         # Get the search criteria
         search = kwargs.get("search", "")
 
@@ -80,16 +100,18 @@ class Query(object):
         count = min(count, settings.GRAPHENE_RESULTS_LIMIT)
 
         # Perform the search
-        jobs = job_search(search_terms, end_time, None, first, count)
+        jobs = job_search(application, search_terms, end_time, None, first, count)
 
         # Generate the results
-        result = []
+        return [klass(**job) for job in jobs]
 
-        for job in jobs:
-            result.append(BilbyPublicJob(**job))
+    @login_required
+    def resolve_public_bilby_jobs(self, info, **kwargs):
+        return Query.perform_search(BilbyPublicJob, 'bilby', info, **kwargs)
 
-        # Done
-        return result
+    @login_required
+    def resolve_public_viterbi_jobs(self, info, **kwargs):
+        return Query.perform_search(ViterbiPublicJob, 'viterbi', info, **kwargs)
 
 
 class Mutation(graphene.ObjectType):
