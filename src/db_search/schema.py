@@ -46,21 +46,24 @@ class ViterbiPublicJob(graphene.ObjectType):
     history = graphene.List(JobHistoryNode)
 
 
+search_kwargs = dict(
+    search=graphene.String(),
+    time_range=graphene.String(),
+    first=graphene.Int(),
+    count=graphene.Int(),
+    exclude_ligo_jobs=graphene.Boolean()
+)
+
+
 class Query(object):
     public_bilby_jobs = graphene.List(
         BilbyPublicJob,
-        search=graphene.String(),
-        time_range=graphene.String(),
-        first=graphene.Int(),
-        count=graphene.Int()
+        search_kwargs
     )
 
     public_viterbi_jobs = graphene.List(
         ViterbiPublicJob,
-        search=graphene.String(),
-        time_range=graphene.String(),
-        first=graphene.Int(),
-        count=graphene.Int()
+        search_kwargs
     )
 
     @staticmethod
@@ -99,8 +102,11 @@ class Query(object):
         # Limit the maximum number of results
         count = min(count, settings.GRAPHENE_RESULTS_LIMIT)
 
+        # Check if we should exclude LIGO jobs or not
+        exclude_ligo_jobs = kwargs.get("exclude_ligo_jobs", True)
+
         # Perform the search
-        jobs = job_search(application, search_terms, end_time, None, first, count)
+        jobs = job_search(application, search_terms, end_time, None, first, count, exclude_ligo_jobs)
 
         # Generate the results
         return [klass(**job) for job in jobs]

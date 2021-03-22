@@ -69,7 +69,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             job_id=self.job_controller_job_completed.id,
             name="test_job",
             description="my potato job is brown",
-            private=False
+            private=False,
+            is_ligo_job=True
         )
 
         self.bilby_job_completed_result = {
@@ -432,7 +433,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             response = self.client.execute(
                 """
                     query {
-                      publicBilbyJobs {
+                      publicBilbyJobs(excludeLigoJobs: false) {
                         user {
                           id
                           username
@@ -510,7 +511,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             response = self.client.execute(
                 f"""
                     query {{
-                      publicBilbyJobs (timeRange: "{_range}") {{
+                      publicBilbyJobs (timeRange: "{_range}", excludeLigoJobs: false) {{
                         user {{
                           id
                           username
@@ -712,7 +713,7 @@ class TestQueriesCustom(CustomJwtTestCase):
         response = self.client.execute(
             f"""
                 query {{
-                  publicBilbyJobs (search: "{terms}") {{
+                  publicBilbyJobs (search: "{terms}", excludeLigoJobs: false) {{
                     user {{
                       id
                       username
@@ -897,7 +898,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             response = self.client.execute(
                 f"""
                     query {{
-                      publicBilbyJobs (first: {first}) {{
+                      publicBilbyJobs (first: {first}, excludeLigoJobs: false) {{
                         user {{
                           id
                           username
@@ -936,7 +937,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             response = self.client.execute(
                 f"""
                     query {{
-                      publicBilbyJobs (count: {count}) {{
+                      publicBilbyJobs (count: {count}, excludeLigoJobs: false) {{
                         user {{
                           id
                           username
@@ -975,7 +976,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             response = self.client.execute(
                 f"""
                     query {{
-                      publicBilbyJobs (first: {first}, count: {count}) {{
+                      publicBilbyJobs (first: {first}, count: {count}, excludeLigoJobs: false) {{
                         user {{
                           id
                           username
@@ -1059,6 +1060,55 @@ class TestQueriesCustom(CustomJwtTestCase):
 
         run_range(
             1, 1000,
+            {
+                'publicBilbyJobs': [
+                    self.bilby_job_completed2_result,
+                    self.bilby_job_incomplete_result
+                ]
+            }
+        )
+
+    def test_exclude_ligo(self):
+        def run_bilby_exclude_ligo(expected):
+            response = self.client.execute(
+                """
+                    query {
+                      publicBilbyJobs (excludeLigoJobs: true) {
+                        user {
+                          id
+                          username
+                          firstName
+                          lastName
+                          email
+                          isLigoUser
+                        }
+                        job {
+                          id
+                          userId
+                          name
+                          description
+                          creationTime
+                          lastUpdated
+                          private
+                          jobId
+                        }
+                        history {
+                          id
+                          timestamp
+                          what
+                          state
+                          details
+                        }
+                      }
+                    }
+                """
+            )
+
+            self.assertDictEqual(
+                expected, response.data, "publicBilbyJobs query returned unexpected data."
+            )
+
+        run_bilby_exclude_ligo(
             {
                 'publicBilbyJobs': [
                     self.bilby_job_completed2_result,

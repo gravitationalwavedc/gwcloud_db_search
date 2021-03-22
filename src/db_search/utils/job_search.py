@@ -48,10 +48,11 @@ WHERE
             AND application = %(application)s
     )
     AND {job_database}.private = FALSE
+    AND {job_database}.is_ligo_job IN %(ligo_job_states)s
 """
 
 
-def job_search_single_term(application, job_klass, term, end_time, valid_states):
+def job_search_single_term(application, job_klass, term, end_time, valid_states, exclude_ligo_jobs):
     """
     Performs a database search for all jobs matching:-
         * the specified single word term
@@ -63,6 +64,7 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states)
     :param term: The single word term to filter on
     :param end_time: Jobs that have finished or updated up until this time will be considered
     :param valid_states: An array of job states to filter on
+    :param exclude_ligo_jobs: If jobs which have is_ligo_job=True should be excluded from the search
 
     :return: A list of job IDs representing the matched jobs
     """
@@ -100,7 +102,8 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states)
             'term': f'%{term}%',
             'end_time': end_time,
             'valid_states': valid_states,
-            'application': application
+            'application': application,
+            'ligo_job_states': (False,) if exclude_ligo_jobs else (True, False)
         }
     )
 
@@ -108,7 +111,7 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states)
     return [job.id for job in qs]
 
 
-def job_search(application, terms, end_time, order_by, first, count):
+def job_search(application, terms, end_time, order_by, first, count, exclude_ligo_jobs):
     """
     Searches for jobs by a list of terms
 
@@ -118,6 +121,8 @@ def job_search(application, terms, end_time, order_by, first, count):
     :param order_by: Order by field
     :param first: Result start offset
     :param count: Number of results to return
+    :param exclude_ligo_jobs: If this is True then all real data jobs run by LIGO users which aren't using GWOSC
+    channels are excluded from the search
 
     :return: A list of job "objects" that contain information about the matched jobs
     """
@@ -155,14 +160,15 @@ def job_search(application, terms, end_time, order_by, first, count):
         for idx, term in enumerate(terms):
             if idx == 0:
                 # If this is the first term, create the initial set of job ids
-                jobs = set(job_search_single_term(application, job_klass, term, end_time, states))
+                jobs = set(job_search_single_term(application, job_klass, term, end_time, states, exclude_ligo_jobs))
             else:
                 # Otherwise intersect the set of job ids, such that the new term is contained in the results from the
                 # previous search. (Every term must exist in each result)
-                jobs = jobs.intersection(job_search_single_term(application, job_klass, term, end_time, states))
+                jobs = jobs.intersection(job_search_single_term(application, job_klass, term, end_time, states,
+                                                                exclude_ligo_jobs))
     else:
         # If there are no terms, this query will be used which returns all jobs
-        jobs = job_search_single_term(application, job_klass, '', end_time, states)
+        jobs = job_search_single_term(application, job_klass, '', end_time, states, exclude_ligo_jobs)
 
     # Next we filter by range count
     jobs = job_klass.objects.using(application).filter(id__in=jobs)
