@@ -2,3 +2,4 @@ resources:
   - gwcloud_db_search_django_deployment.yaml
   - gwcloud_db_search_django_service.yaml
   - gwcloud_db_search_secrets_integrator.yaml
+  - gwcloud_db_search_vault_rbac.yaml
