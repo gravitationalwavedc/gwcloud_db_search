@@ -4,7 +4,7 @@ from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from gwauth.models import GWCloudUser
 from jobserver.models import Job, JobHistory
-from bilby.models import BilbyJob
+from bilby.models import BilbyJob, Label
 from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
@@ -25,6 +25,7 @@ class TestSearch(SimpleTestCase):
         JobHistory.objects.using('jobserver').all().delete()
         BilbyJob.objects.using('bilby').all().delete()
         BilbyJob.objects.using('viterbi').all().delete()
+        Label.objects.using('bilby').all().delete()
 
         # Insert users
         self.user_1 = GWCloudUser.objects.using('gwauth').create(
@@ -240,6 +241,36 @@ class TestSearch(SimpleTestCase):
             description="my potato job is brown_viterbi",
             private=False
         )
+
+        self.label_bad_run = Label.objects.using('bilby').create(
+            name='Bad Run',
+            description='This run contains some issues and should not be used for science.',
+        )
+
+        self.label_production_run = Label.objects.using('bilby').create(
+            name='Production Run',
+            description='This run has been completed successfully and can be used for science.',
+        )
+
+        self.label_review_requested = Label.objects.using('bilby').create(
+            name='Review Requested',
+            description='This run should be reviewed by peers.',
+        )
+
+        self.label_reviewed = Label.objects.using('bilby').create(
+            name='Reviewed',
+            description='This run has been reviewed.',
+        )
+
+        self.bilby_job_completed.labels.add(self.label_bad_run)
+        self.bilby_job_completed.labels.add(self.label_review_requested)
+
+        self.bilby_job_incomplete.labels.add(self.label_bad_run)
+
+        self.bilby_job_error.labels.add(self.label_bad_run)
+
+        self.bilby_job_completed2.labels.add(self.label_production_run)
+        self.bilby_job_completed2.labels.add(self.label_reviewed)
 
     def test_no_terms(self):
         expected = [
@@ -520,6 +551,41 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
+        # Test labels
+        results = job_search('bilby', ['production'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search('bilby', ['REVIEWED'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search('bilby', ['bad'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_incomplete
+            ]
+        )
+
+        results = job_search('bilby', ['review'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_completed2
+            ]
+        )
+
         # Test non existent terms
         results = job_search('bilby', ['blue'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
@@ -623,6 +689,64 @@ class TestSearch(SimpleTestCase):
                 job_incomplete
             ]
         )
+
+        # Check matching tags
+        results = job_search('bilby', ['review', 'ReQuEsTeD'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed
+            ]
+        )
+
+        results = job_search('bilby', ['bad', 'run'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_incomplete
+            ]
+        )
+
+        results = job_search('bilby', ['purple', 'production'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search('bilby', ['purple', 'production', 'review'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search('bilby', ['purple', 'production', 'reviewed'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search('bilby', ['purple', 'production', 'review', 'test'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search(
+            'bilby', ['purple', 'production', 'reviewed', 'test', 'brown'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(results, [])
+
+        results = job_search('bilby',
+                             ['purple', 'production', 'reviewed', 'test', 'bad'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(results, [])
 
     def test_single_term_viterbi(self):
         job_completed = {

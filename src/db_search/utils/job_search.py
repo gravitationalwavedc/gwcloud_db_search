@@ -10,45 +10,60 @@ sql_term_search = """
 SELECT
     id
 FROM
-    {job_database}
+    {job_table}
 WHERE
     (
         user_id IN (
             SELECT
                 id
             FROM
-                {gwcloud_auth}.gwauth_gwclouduser
+                {auth_database}.gwauth_gwclouduser
             WHERE
                 first_name LIKE %(term)s
                 OR last_name LIKE %(term)s
         )
-        OR {job_database}.name LIKE %(term)s
-        OR {job_database}.description LIKE %(term)s
+        OR {job_table}.name LIKE %(term)s
+        OR {job_table}.description LIKE %(term)s
+        OR id IN (
+            SELECT
+                {job_label_table}.{application}job_id
+            FROM
+                {job_label_table}
+            WHERE
+                {job_label_table}.label_id IN (
+                    SELECT
+                        {label_table}.id
+                    FROM
+                        {label_table}
+                    WHERE
+                        name LIKE %(term)s
+                )
+        )
     )
     AND job_id in (
         SELECT
-            {gwcloud_jobcontroller}.jobserver_job.id
+            {jobcontroller_database}.jobserver_job.id
         FROM
-            {gwcloud_jobcontroller}.jobserver_job
+            {jobcontroller_database}.jobserver_job
         INNER JOIN
-            {gwcloud_jobcontroller}.jobserver_jobhistory ON
-                ({gwcloud_jobcontroller}.jobserver_job.id = {gwcloud_jobcontroller}.jobserver_jobhistory.job_id)
+            {jobcontroller_database}.jobserver_jobhistory ON
+                ({jobcontroller_database}.jobserver_job.id = {jobcontroller_database}.jobserver_jobhistory.job_id)
         WHERE
-            {gwcloud_jobcontroller}.jobserver_jobhistory.timestamp >= %(end_time)s
+            {jobcontroller_database}.jobserver_jobhistory.timestamp >= %(end_time)s
             AND (
                 SELECT
-                    {gwcloud_jobcontroller}.jobserver_jobhistory.state
+                    {jobcontroller_database}.jobserver_jobhistory.state
                 FROM
-                    {gwcloud_jobcontroller}.jobserver_jobhistory
+                    {jobcontroller_database}.jobserver_jobhistory
                 WHERE
-                    {gwcloud_jobcontroller}.jobserver_jobhistory.job_id = {gwcloud_jobcontroller}.jobserver_job.id
-                ORDER BY {gwcloud_jobcontroller}.jobserver_jobhistory.timestamp DESC
+                    {jobcontroller_database}.jobserver_jobhistory.job_id = {jobcontroller_database}.jobserver_job.id
+                ORDER BY {jobcontroller_database}.jobserver_jobhistory.timestamp DESC
                 LIMIT 1
             ) in %(valid_states)s
             AND application = %(application)s
     )
-    AND {job_database}.private = FALSE
-    AND {job_database}.is_ligo_job IN %(ligo_job_states)s
+    AND {job_table}.private = FALSE
+    AND {job_table}.is_ligo_job IN %(ligo_job_states)s
 """
 
 
@@ -72,25 +87,26 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states,
     if settings.TESTING:
         db_dict = \
             {
-                'gwcloud_auth': settings.DATABASES['gwauth']['TEST']['NAME'],
-                'gwcloud_jobcontroller': settings.DATABASES['jobserver']['TEST']['NAME'],
+                'auth_database': settings.DATABASES['gwauth']['TEST']['NAME'],
+                'jobcontroller_database': settings.DATABASES['jobserver']['TEST']['NAME'],
+                'job_table': settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_{application}job',
+                'label_table': settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_label',
+                'job_label_table':
+                    settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_{application}job_labels',
+                'application': application
             }
 
-        if application == 'bilby':
-            db_dict['job_database'] = settings.DATABASES['bilby']['TEST']['NAME'] + '.bilby_bilbyjob'
-        elif application == 'viterbi':
-            db_dict['job_database'] = settings.DATABASES['viterbi']['TEST']['NAME'] + '.viterbi_viterbijob'
     else:
         db_dict = \
             {
-                'gwcloud_auth': settings.DATABASES['gwauth']['NAME'],
-                'gwcloud_jobcontroller': settings.DATABASES['jobserver']['NAME'],
+                'auth_database': settings.DATABASES['gwauth']['NAME'],
+                'jobcontroller_database': settings.DATABASES['jobserver']['NAME'],
+                'job_table': settings.DATABASES[application]['NAME'] + f'.{application}_{application}job',
+                'label_table': settings.DATABASES[application]['NAME'] + f'.{application}_label',
+                'job_label_table':
+                    settings.DATABASES[application]['NAME'] + f'.{application}_{application}job_labels',
+                'application': application
             }
-
-        if application == 'bilby':
-            db_dict['job_database'] = settings.DATABASES['bilby']['NAME'] + '.bilby_bilbyjob'
-        elif application == 'viterbi':
-            db_dict['job_database'] = settings.DATABASES['viterbi']['NAME'] + '.viterbi_viterbijob'
 
     # Format the database query
     sql_term_search_prepared = sql_term_search.format_map(db_dict)
