@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y python-virtualenv build-essential pytho
 RUN virtualenv -p python3 /src/venv
 
 # Activate and install the django requirements (mysqlclient requires python3-dev and build-essential)
-RUN . /src/venv/bin/activate && pip install -r /src/requirements.txt && pip install gunicorn
+RUN . /src/venv/bin/activate && pip install -r /src/requirements.txt && pip install mysqlclient && pip install gunicorn
 
 # Clean up unneeded packages
 RUN apt-get remove --purge -y build-essential python3-dev
