@@ -1,7 +1,7 @@
 from django.conf import settings
 from gwauth.models import GWCloudUser
 from jobserver.models import JobHistory
-from bilby.models import BilbyJob
+from bilbyui.models import BilbyJob
 from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
@@ -26,7 +26,7 @@ WHERE
         OR {job_table}.description LIKE %(term)s
         OR id IN (
             SELECT
-                {job_label_table}.{application}job_id
+                {job_label_table}.{job_model_name}job_id
             FROM
                 {job_label_table}
             WHERE
@@ -40,7 +40,7 @@ WHERE
                 )
         )
     )
-    AND job_id in (
+    AND job_controller_id in (
         SELECT
             {jobcontroller_database}.jobserver_job.id
         FROM
@@ -83,17 +83,23 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states,
 
     :return: A list of job IDs representing the matched jobs
     """
+    # Get the correct job model name for bilby
+    job_model_name = application
+    if application == 'bilbyui':
+        job_model_name = 'bilby'
+
     # We need to use the correct database names for testing
     if settings.TESTING:
         db_dict = \
             {
                 'auth_database': settings.DATABASES['gwauth']['TEST']['NAME'],
                 'jobcontroller_database': settings.DATABASES['jobserver']['TEST']['NAME'],
-                'job_table': settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_{application}job',
+                'job_table': settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_{job_model_name}job',
                 'label_table': settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_label',
                 'job_label_table':
-                    settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_{application}job_labels',
-                'application': application
+                    settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_{job_model_name}job_labels',
+                'application': application,
+                'job_model_name': job_model_name
             }
 
     else:
@@ -101,11 +107,12 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states,
             {
                 'auth_database': settings.DATABASES['gwauth']['NAME'],
                 'jobcontroller_database': settings.DATABASES['jobserver']['NAME'],
-                'job_table': settings.DATABASES[application]['NAME'] + f'.{application}_{application}job',
+                'job_table': settings.DATABASES[application]['NAME'] + f'.{application}_{job_model_name}job',
                 'label_table': settings.DATABASES[application]['NAME'] + f'.{application}_label',
                 'job_label_table':
-                    settings.DATABASES[application]['NAME'] + f'.{application}_{application}job_labels',
-                'application': application
+                    settings.DATABASES[application]['NAME'] + f'.{application}_{job_model_name}job_labels',
+                'application': application,
+                'job_model_name': job_model_name
             }
 
     # Format the database query
@@ -163,7 +170,7 @@ def job_search(application, terms, end_time, order_by, first, count, exclude_lig
 
     # Get the job class
     job_klass = None
-    if application == 'bilby':
+    if application == 'bilbyui':
         job_klass = BilbyJob
     elif application == 'viterbi':
         job_klass = ViterbiJob
@@ -198,7 +205,7 @@ def job_search(application, terms, end_time, order_by, first, count, exclude_lig
         jobs = jobs[:count]
 
     # Store the jobs in a dictionary by job id
-    jobs = {job.job_id: job for job in jobs}
+    jobs = {job.job_controller_id: job for job in jobs}
 
     # Get the list of user ids to fetch
     users = set()

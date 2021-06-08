@@ -73,10 +73,11 @@ WSGI_APPLICATION = 'gw_db_search.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+DATABASE_ROUTERS = ['db_search.utils.db_router.DBRouter']
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3'
+        'ENGINE': 'django.db.backends.sqlite3'
     },
     'gwauth': {
         'ENGINE': 'django.db.backends.mysql',
@@ -100,7 +101,7 @@ DATABASES = {
             'NAME': 'test_gwcloud_jobcontroller',
         },
     },
-    'bilby': {
+    'bilbyui': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_bilby',
         'HOST': 'localhost',
@@ -192,7 +193,7 @@ AUTH_USER_MODEL = 'gwauth.GWCloudUser'
 GWCLOUD_APPS = {
     'gwauth': 'apps/gwcloud_auth/src/',
     'jobserver': 'apps/gwcloud_job_server/src/utils/schema/',
-    'bilby': 'apps/gwcloud_bilby/src/',
+    'bilbyui': 'apps/gwcloud_bilby/src/',
     'viterbi': 'apps/gwlab_viterbi/src/'
 }
 

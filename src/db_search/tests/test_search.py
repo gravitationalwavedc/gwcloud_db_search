@@ -4,7 +4,7 @@ from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from gwauth.models import GWCloudUser
 from jobserver.models import Job, JobHistory
-from bilby.models import BilbyJob, Label
+from bilbyui.models import BilbyJob, Label
 from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
@@ -23,9 +23,8 @@ class TestSearch(SimpleTestCase):
         GWCloudUser.objects.using('gwauth').all().delete()
         Job.objects.using('jobserver').all().delete()
         JobHistory.objects.using('jobserver').all().delete()
-        BilbyJob.objects.using('bilby').all().delete()
-        BilbyJob.objects.using('viterbi').all().delete()
-        Label.objects.using('bilby').all().delete()
+        BilbyJob.objects.using('bilbyui').all().delete()
+        Label.objects.using('bilbyui').all().delete()
 
         # Insert users
         self.user_1 = GWCloudUser.objects.using('gwauth').create(
@@ -49,7 +48,7 @@ class TestSearch(SimpleTestCase):
             user=self.user_1.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_completed_history1 = JobHistory.objects.using('jobserver').create(
@@ -59,9 +58,9 @@ class TestSearch(SimpleTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_completed = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_completed = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_completed.user,
-            job_id=self.job_controller_job_completed.id,
+            job_controller_id=self.job_controller_job_completed.id,
             name="test_job",
             description="my potato job is brown",
             private=False,
@@ -73,7 +72,7 @@ class TestSearch(SimpleTestCase):
             user=self.user_2.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_completed2_history1 = JobHistory.objects.using('jobserver').create(
@@ -95,9 +94,9 @@ class TestSearch(SimpleTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_completed2 = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_completed2 = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_completed2.user,
-            job_id=self.job_controller_job_completed2.id,
+            job_controller_id=self.job_controller_job_completed2.id,
             name="test_job_purple",
             description="this job is actually cyan",
             private=False
@@ -108,7 +107,7 @@ class TestSearch(SimpleTestCase):
             user=self.user_2.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_incomplete_history1 = JobHistory.objects.using('jobserver').create(
@@ -118,9 +117,9 @@ class TestSearch(SimpleTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_incomplete = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_incomplete = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_incomplete.user,
-            job_id=self.job_controller_job_incomplete.id,
+            job_controller_id=self.job_controller_job_incomplete.id,
             name="test_job_incomplete",
             description="my potato job is violet",
             private=False
@@ -131,7 +130,7 @@ class TestSearch(SimpleTestCase):
             user=self.user_1.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_error_history1 = JobHistory.objects.using('jobserver').create(
@@ -153,9 +152,9 @@ class TestSearch(SimpleTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_error = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_error = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_error.user,
-            job_id=self.job_controller_job_error.id,
+            job_controller_id=self.job_controller_job_error.id,
             name="test_job_error",
             description="This job is also violet - but is an error so should never show up",
             private=False
@@ -166,7 +165,7 @@ class TestSearch(SimpleTestCase):
             user=self.user_2.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_error2_history1 = JobHistory.objects.using('jobserver').create(
@@ -212,9 +211,9 @@ class TestSearch(SimpleTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_error = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_error = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_error.user,
-            job_id=self.job_controller_job_error.id,
+            job_controller_id=self.job_controller_job_error.id,
             name="test_job_error_GWOSC",
             description="my potato job is another errored job but let's call this one magenta",
             private=False
@@ -236,28 +235,28 @@ class TestSearch(SimpleTestCase):
 
         self.job_completed_viterbi = ViterbiJob.objects.using('viterbi').create(
             user_id=self.job_controller_job_completed_viterbi.user,
-            job_id=self.job_controller_job_completed_viterbi.id,
+            job_controller_id=self.job_controller_job_completed_viterbi.id,
             name="test_job_viterbi",
             description="my potato job is brown_viterbi",
             private=False
         )
 
-        self.label_bad_run = Label.objects.using('bilby').create(
+        self.label_bad_run = Label.objects.using('bilbyui').create(
             name='Bad Run',
             description='This run contains some issues and should not be used for science.',
         )
 
-        self.label_production_run = Label.objects.using('bilby').create(
+        self.label_production_run = Label.objects.using('bilbyui').create(
             name='Production Run',
             description='This run has been completed successfully and can be used for science.',
         )
 
-        self.label_review_requested = Label.objects.using('bilby').create(
+        self.label_review_requested = Label.objects.using('bilbyui').create(
             name='Review Requested',
             description='This run should be reviewed by peers.',
         )
 
-        self.label_reviewed = Label.objects.using('bilby').create(
+        self.label_reviewed = Label.objects.using('bilbyui').create(
             name='Reviewed',
             description='This run has been reviewed.',
         )
@@ -302,60 +301,60 @@ class TestSearch(SimpleTestCase):
         end_time = timezone.now() - datetime.timedelta(days=1)
 
         # Test that all results are returned as expected
-        results = job_search('bilby', [], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
 
         # Test range limiting
-        results = job_search('bilby', [], end_time, None, 0, 1, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 1, False)
         self.assertSequenceEqual(results, expected[:1])
 
-        results = job_search('bilby', [], end_time, None, 0, 2, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 2, False)
         self.assertSequenceEqual(results, expected[:2])
 
         # Test slicing
-        results = job_search('bilby', [], end_time, None, 1, 1, False)
+        results = job_search('bilbyui', [], end_time, None, 1, 1, False)
         self.assertSequenceEqual(results, expected[1:2])
 
-        results = job_search('bilby', [], end_time, None, 1, 2, False)
+        results = job_search('bilbyui', [], end_time, None, 1, 2, False)
         self.assertSequenceEqual(results, expected[1:3])
 
-        results = job_search('bilby', [], end_time, None, 2, 1, False)
+        results = job_search('bilbyui', [], end_time, None, 2, 1, False)
         self.assertSequenceEqual(results, expected[2:3])
 
         # Test out of bounds returns an empty array (No results)
-        results = job_search('bilby', [], end_time, None, 2000, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 2000, 20, False)
         self.assertSequenceEqual(results, [])
 
         # Test that the time filter works as expected
         self.job_controller_job_completed_history1.timestamp = end_time
         self.job_controller_job_completed_history1.save()
 
-        results = job_search('bilby', [], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
 
         self.job_controller_job_completed_history1.timestamp = end_time - datetime.timedelta(seconds=1)
         self.job_controller_job_completed_history1.save()
 
-        results = job_search('bilby', [], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected[1:])
 
         self.job_controller_job_completed_history1.timestamp = timezone.now()
         self.job_controller_job_completed_history1.save()
 
-        results = job_search('bilby', [], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
 
         # Check private jobs are excluded
         self.bilby_job_completed.private = True
         self.bilby_job_completed.save()
 
-        results = job_search('bilby', [], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected[1:])
 
         self.bilby_job_completed.private = False
         self.bilby_job_completed.save()
 
-        results = job_search('bilby', [], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
 
         # Check that a job that completes is still reported correctly
@@ -370,7 +369,7 @@ class TestSearch(SimpleTestCase):
             self.job_controller_job_incomplete_history2,
             self.job_controller_job_incomplete_history1
         ]
-        results = job_search('bilby', [], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
 
         self.job_controller_job_incomplete_history2.delete()
@@ -405,7 +404,7 @@ class TestSearch(SimpleTestCase):
         # Test user names
 
         # Should match all jobs since username starts with user for both test users
-        results = job_search('bilby', ['user'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['user'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -416,7 +415,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Should match jobs by just user 1
-        results = job_search('bilby', ['magenta'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['magenta'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -425,7 +424,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Should match jobs by just user 2
-        results = job_search('bilby', ['yellow'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['yellow'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -436,7 +435,7 @@ class TestSearch(SimpleTestCase):
 
         # Test user first name
         # Should match jobs by just user 2
-        results = job_search('bilby', ['another'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['another'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -447,7 +446,7 @@ class TestSearch(SimpleTestCase):
 
         # Test user last name
         # Should match jobs by just user 1
-        results = job_search('bilby', ['one'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['one'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -456,7 +455,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Should match jobs by just user 2
-        results = job_search('bilby', ['two'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['two'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -467,7 +466,7 @@ class TestSearch(SimpleTestCase):
 
         # Test job name
         # Should match all jobs
-        results = job_search('bilby', ['test_job'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['test_job'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -478,7 +477,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Should match only completed2
-        results = job_search('bilby', ['test_job_purple'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['test_job_purple'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -487,7 +486,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Test job description
-        results = job_search('bilby', ['potato'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['potato'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -496,7 +495,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['brown'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['brown'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -504,7 +503,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['cyan'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['cyan'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -512,7 +511,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['violet'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['violet'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -522,7 +521,7 @@ class TestSearch(SimpleTestCase):
 
         # Double check case insensitivity
         # Should match all jobs
-        results = job_search('bilby', ['tEsT_jOb'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['tEsT_jOb'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -533,7 +532,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Should match only completed2
-        results = job_search('bilby', ['TeSt_JoB_pUrPlE'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['TeSt_JoB_pUrPlE'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -542,7 +541,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Test job description
-        results = job_search('bilby', ['POTATO'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['POTATO'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -552,7 +551,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Test labels
-        results = job_search('bilby', ['production'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['production'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -560,7 +559,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['REVIEWED'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['REVIEWED'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -568,7 +567,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['bad'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['bad'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -577,7 +576,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['review'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['review'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -587,13 +586,13 @@ class TestSearch(SimpleTestCase):
         )
 
         # Test non existent terms
-        results = job_search('bilby', ['blue'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['blue'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             []
         )
 
-        results = job_search('bilby', ['orange'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['orange'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             []
@@ -627,7 +626,7 @@ class TestSearch(SimpleTestCase):
         end_time = timezone.now() - datetime.timedelta(days=1)
 
         # Should match all jobs
-        results = job_search('bilby', ['test', 'job'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['test', 'job'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -639,7 +638,7 @@ class TestSearch(SimpleTestCase):
 
         # Should match all jobs
         results = job_search(
-            'bilby',
+            'bilbyui',
             ['test', 'job', 'test', 'job', 'test', 'job', 'test', 'job'],
             end_time, None, 0, 20, False
         )
@@ -653,7 +652,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Should only match completed2
-        results = job_search('bilby', ['test', 'job', 'purple'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['test', 'job', 'purple'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -662,7 +661,7 @@ class TestSearch(SimpleTestCase):
         )
 
         results = job_search(
-            'bilby',
+            'bilbyui',
             ['test', 'job', 'purple', 'actually', 'cyan', 'yellow', 'another', 'two'],
             end_time, None, 0, 20, False
         )
@@ -675,14 +674,14 @@ class TestSearch(SimpleTestCase):
 
         # Should match nothing
         results = job_search(
-            'bilby',
+            'bilbyui',
             ['test', 'job', 'purple', 'actually', 'cyan', 'yellow', 'another', 'two', 'blue'],
             end_time, None, 0, 20, False
         )
         self.assertSequenceEqual(results, [])
 
         # Should match only the incomplete job
-        results = job_search('bilby', ['potato', 'two'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['potato', 'two'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -691,7 +690,7 @@ class TestSearch(SimpleTestCase):
         )
 
         # Check matching tags
-        results = job_search('bilby', ['review', 'ReQuEsTeD'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['review', 'ReQuEsTeD'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -699,7 +698,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['bad', 'run'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['bad', 'run'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -708,7 +707,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['purple', 'production'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['purple', 'production'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -716,7 +715,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['purple', 'production', 'review'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['purple', 'production', 'review'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -724,7 +723,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['purple', 'production', 'reviewed'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['purple', 'production', 'reviewed'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -732,7 +731,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
-        results = job_search('bilby', ['purple', 'production', 'review', 'test'], end_time, None, 0, 20, False)
+        results = job_search('bilbyui', ['purple', 'production', 'review', 'test'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
             results,
             [
@@ -741,10 +740,10 @@ class TestSearch(SimpleTestCase):
         )
 
         results = job_search(
-            'bilby', ['purple', 'production', 'reviewed', 'test', 'brown'], end_time, None, 0, 20, False)
+            'bilbyui', ['purple', 'production', 'reviewed', 'test', 'brown'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, [])
 
-        results = job_search('bilby',
+        results = job_search('bilbyui',
                              ['purple', 'production', 'reviewed', 'test', 'bad'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, [])
 
@@ -793,7 +792,7 @@ class TestSearch(SimpleTestCase):
         end_time = timezone.now() - datetime.timedelta(days=1)
 
         # Test that all results are returned as expected
-        results = job_search('bilby', [], end_time, None, 0, 20, True)
+        results = job_search('bilbyui', [], end_time, None, 0, 20, True)
         self.assertSequenceEqual(results, expected)
 
         for result in results:

@@ -7,7 +7,7 @@ from graphene_django import DjangoObjectType
 from graphql_jwt.decorators import login_required
 from gwauth.models import GWCloudUser
 from jobserver.models import JobHistory
-from bilby.models import BilbyJob
+from bilbyui.models import BilbyJob
 from viterbi.models import ViterbiJob
 
 from db_search.utils.job_search import job_search
@@ -113,7 +113,7 @@ class Query(object):
 
     @login_required
     def resolve_public_bilby_jobs(self, info, **kwargs):
-        return Query.perform_search(BilbyPublicJob, 'bilby', info, **kwargs)
+        return Query.perform_search(BilbyPublicJob, 'bilbyui', info, **kwargs)
 
     @login_required
     def resolve_public_viterbi_jobs(self, info, **kwargs):

@@ -6,7 +6,7 @@ from django.test import override_settings
 from django.utils import timezone
 from gwauth.models import GWCloudUser
 from jobserver.models import JobHistory, Job
-from bilby.models import BilbyJob
+from bilbyui.models import BilbyJob
 from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
@@ -27,7 +27,7 @@ class TestQueriesCustom(CustomJwtTestCase):
         GWCloudUser.objects.using('gwauth').all().delete()
         Job.objects.using('jobserver').all().delete()
         JobHistory.objects.using('jobserver').all().delete()
-        BilbyJob.objects.using('bilby').all().delete()
+        BilbyJob.objects.using('bilbyui').all().delete()
         ViterbiJob.objects.using('viterbi').all().delete()
 
         # Insert users
@@ -54,7 +54,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             user=self.user_1.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_completed_history1 = JobHistory.objects.using('jobserver').create(
@@ -64,9 +64,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_completed = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_completed = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_completed.user,
-            job_id=self.job_controller_job_completed.id,
+            job_controller_id=self.job_controller_job_completed.id,
             name="test_job",
             description="my potato job is brown",
             private=False,
@@ -90,7 +90,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'creationTime': graphene.DateTime().serialize(self.bilby_job_completed.creation_time),
                 'lastUpdated': graphene.DateTime().serialize(self.bilby_job_completed.last_updated),
                 'private': False,
-                'jobId': self.bilby_job_completed.job_id
+                'jobControllerId': self.bilby_job_completed.job_controller_id
             },
             'history': [{
                 'id': str(self.job_controller_job_completed_history1.id),
@@ -106,7 +106,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             user=self.user_2.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_completed2_history1 = JobHistory.objects.using('jobserver').create(
@@ -128,9 +128,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_completed2 = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_completed2 = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_completed2.user,
-            job_id=self.job_controller_job_completed2.id,
+            job_controller_id=self.job_controller_job_completed2.id,
             name="test_job_purple",
             description="this job is actually cyan",
             private=False
@@ -153,7 +153,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'creationTime': graphene.DateTime().serialize(self.bilby_job_completed2.creation_time),
                 'lastUpdated': graphene.DateTime().serialize(self.bilby_job_completed2.last_updated),
                 'private': False,
-                'jobId': self.bilby_job_completed2.job_id
+                'jobControllerId': self.bilby_job_completed2.job_controller_id
             },
             'history': [{
                 'id': str(self.job_controller_job_completed2_history3.id),
@@ -181,7 +181,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             user=self.user_2.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_incomplete_history1 = JobHistory.objects.using('jobserver').create(
@@ -191,9 +191,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_incomplete = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_incomplete = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_incomplete.user,
-            job_id=self.job_controller_job_incomplete.id,
+            job_controller_id=self.job_controller_job_incomplete.id,
             name="test_job_incomplete",
             description="my potato job is violet",
             private=False
@@ -216,7 +216,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'creationTime': graphene.DateTime().serialize(self.bilby_job_incomplete.creation_time),
                 'lastUpdated': graphene.DateTime().serialize(self.bilby_job_incomplete.last_updated),
                 'private': False,
-                'jobId': self.bilby_job_incomplete.job_id
+                'jobControllerId': self.bilby_job_incomplete.job_controller_id
             },
             'history': [{
                 'id': str(self.job_controller_job_incomplete_history1.id),
@@ -232,7 +232,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             user=self.user_1.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_error_history1 = JobHistory.objects.using('jobserver').create(
@@ -254,9 +254,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_error = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_error = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_error.user,
-            job_id=self.job_controller_job_error.id,
+            job_controller_id=self.job_controller_job_error.id,
             name="test_job_error",
             description="This job is also violet - but is an error so should never show up",
             private=False
@@ -267,7 +267,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             user=self.user_2.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_error2_history1 = JobHistory.objects.using('jobserver').create(
@@ -313,9 +313,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             timestamp=timezone.now()
         )
 
-        self.bilby_job_error = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_error = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_error.user,
-            job_id=self.job_controller_job_error.id,
+            job_controller_id=self.job_controller_job_error.id,
             name="test_job_error_GWOSC",
             description="my potato job is another errored job but let's call this one magenta",
             private=False
@@ -326,7 +326,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             user=self.user_2.id,
             cluster="test_cluster",
             bundle="test_bundle",
-            application='bilby'
+            application='bilbyui'
         )
 
         self.job_controller_job_completed_old_history1 = JobHistory.objects.using('jobserver').create(
@@ -336,9 +336,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             timestamp=timezone.now() - datetime.timedelta(days=366)
         )
 
-        self.bilby_job_completed_old = BilbyJob.objects.using('bilby').create(
+        self.bilby_job_completed_old = BilbyJob.objects.using('bilbyui').create(
             user_id=self.job_controller_job_completed_old.user,
-            job_id=self.job_controller_job_completed_old.id,
+            job_controller_id=self.job_controller_job_completed_old.id,
             name="test_job_orange",
             description="my potato job is orange",
             private=False
@@ -363,7 +363,7 @@ class TestQueriesCustom(CustomJwtTestCase):
 
         self.job_completed_viterbi = ViterbiJob.objects.using('viterbi').create(
             user_id=self.job_controller_job_completed_viterbi.user,
-            job_id=self.job_controller_job_completed_viterbi.id,
+            job_controller_id=self.job_controller_job_completed_viterbi.id,
             name="test_job_viterbi",
             description="my potato job is brown_viterbi",
             private=False
@@ -386,7 +386,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'creationTime': graphene.DateTime().serialize(self.job_completed_viterbi.creation_time),
                 'lastUpdated': graphene.DateTime().serialize(self.job_completed_viterbi.last_updated),
                 'private': False,
-                'jobId': self.job_completed_viterbi.job_id
+                'jobControllerId': self.job_completed_viterbi.job_controller_id
             },
             'history': [{
                 'id': str(self.job_controller_job_completed_history1_viterbi.id),
@@ -417,7 +417,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                 'creationTime': graphene.DateTime().serialize(self.bilby_job_completed_old.creation_time),
                 'lastUpdated': graphene.DateTime().serialize(self.bilby_job_completed_old.last_updated),
                 'private': False,
-                'jobId': self.bilby_job_completed_old.job_id
+                'jobControllerId': self.bilby_job_completed_old.job_controller_id
             },
             'history': [{
                 'id': str(self.job_controller_job_completed_old_history1.id),
@@ -450,7 +450,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                           creationTime
                           lastUpdated
                           private
-                          jobId
+                          jobControllerId
                         }
                         history {
                           id
@@ -528,7 +528,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                           creationTime
                           lastUpdated
                           private
-                          jobId
+                          jobControllerId
                         }}
                         history {{
                           id
@@ -730,7 +730,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                       creationTime
                       lastUpdated
                       private
-                      jobId
+                      jobControllerId
                     }}
                     history {{
                       id
@@ -769,7 +769,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                       creationTime
                       lastUpdated
                       private
-                      jobId
+                      jobControllerId
                     }}
                     history {{
                       id
@@ -915,7 +915,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                           creationTime
                           lastUpdated
                           private
-                          jobId
+                          jobControllerId
                         }}
                         history {{
                           id
@@ -954,7 +954,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                           creationTime
                           lastUpdated
                           private
-                          jobId
+                          jobControllerId
                         }}
                         history {{
                           id
@@ -993,7 +993,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                           creationTime
                           lastUpdated
                           private
-                          jobId
+                          jobControllerId
                         }}
                         history {{
                           id
@@ -1090,7 +1090,7 @@ class TestQueriesCustom(CustomJwtTestCase):
                           creationTime
                           lastUpdated
                           private
-                          jobId
+                          jobControllerId
                         }
                         history {
                           id

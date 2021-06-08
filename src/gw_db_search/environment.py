@@ -27,7 +27,7 @@ DATABASES = {
         'PORT': 3306,
         'PASSWORD': MYSQL_PASSWORD,
     },
-    'bilby': {
+    'bilbyui': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_bilby',
         'HOST': MYSQL_HOST,
