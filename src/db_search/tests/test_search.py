@@ -102,6 +102,26 @@ class TestSearch(SimpleTestCase):
             private=False
         )
 
+        # Uploaded bilby job
+        self.uploaded_bilby_job1 = BilbyJob.objects.using('bilbyui').create(
+            user_id=self.job_controller_job_completed.user,
+            job_controller_id=None,
+            name="test_job_uploaded",
+            description="my potato job is magenta",
+            private=False,
+            is_uploaded_job=True
+        )
+
+        self.uploaded_bilby_job2 = BilbyJob.objects.using('bilbyui').create(
+            user_id=self.job_controller_job_completed.user,
+            job_controller_id=None,
+            name="test_job_uploaded2",
+            description="my grape job is fermented",
+            private=False,
+            is_uploaded_job=True,
+            is_ligo_job=True
+        )
+
         # Incomplete job
         self.job_controller_job_incomplete = Job.objects.using('jobserver').create(
             user=self.user_2.id,
@@ -290,6 +310,16 @@ class TestSearch(SimpleTestCase):
                 'job': self.bilby_job_completed2
             },
             {
+                'user': self.user_1,
+                'history': [],
+                'job': self.uploaded_bilby_job1
+            },
+            {
+                'user': self.user_1,
+                'history': [],
+                'job': self.uploaded_bilby_job2
+            },
+            {
                 'user': self.user_2,
                 'history': [
                     self.job_controller_job_incomplete_history1
@@ -398,6 +428,16 @@ class TestSearch(SimpleTestCase):
             ],
             'job': self.bilby_job_incomplete
         }
+        job_uploaded1 = {
+            'user': self.user_1,
+            'history': [],
+            'job': self.uploaded_bilby_job1
+        }
+        job_uploaded2 = {
+            'user': self.user_1,
+            'history': [],
+            'job': self.uploaded_bilby_job2
+        }
 
         end_time = timezone.now() - datetime.timedelta(days=1)
 
@@ -410,6 +450,8 @@ class TestSearch(SimpleTestCase):
             [
                 job_completed,
                 job_completed2,
+                job_uploaded1,
+                job_uploaded2,
                 job_incomplete
             ]
         )
@@ -419,7 +461,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed
+                job_completed,
+                job_uploaded1,
+                job_uploaded2
             ]
         )
 
@@ -450,7 +494,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed
+                job_completed,
+                job_uploaded1,
+                job_uploaded2
             ]
         )
 
@@ -472,6 +518,8 @@ class TestSearch(SimpleTestCase):
             [
                 job_completed,
                 job_completed2,
+                job_uploaded1,
+                job_uploaded2,
                 job_incomplete
             ]
         )
@@ -491,6 +539,7 @@ class TestSearch(SimpleTestCase):
             results,
             [
                 job_completed,
+                job_uploaded1,
                 job_incomplete
             ]
         )
@@ -527,6 +576,8 @@ class TestSearch(SimpleTestCase):
             [
                 job_completed,
                 job_completed2,
+                job_uploaded1,
+                job_uploaded2,
                 job_incomplete
             ]
         )
@@ -546,6 +597,7 @@ class TestSearch(SimpleTestCase):
             results,
             [
                 job_completed,
+                job_uploaded1,
                 job_incomplete
             ]
         )
@@ -622,6 +674,16 @@ class TestSearch(SimpleTestCase):
             ],
             'job': self.bilby_job_incomplete
         }
+        job_uploaded1 = {
+            'user': self.user_1,
+            'history': [],
+            'job': self.uploaded_bilby_job1
+        }
+        job_uploaded2 = {
+            'user': self.user_1,
+            'history': [],
+            'job': self.uploaded_bilby_job2
+        }
 
         end_time = timezone.now() - datetime.timedelta(days=1)
 
@@ -632,6 +694,8 @@ class TestSearch(SimpleTestCase):
             [
                 job_completed,
                 job_completed2,
+                job_uploaded1,
+                job_uploaded2,
                 job_incomplete
             ]
         )
@@ -647,6 +711,8 @@ class TestSearch(SimpleTestCase):
             [
                 job_completed,
                 job_completed2,
+                job_uploaded1,
+                job_uploaded2,
                 job_incomplete
             ]
         )
@@ -779,6 +845,11 @@ class TestSearch(SimpleTestCase):
                     self.job_controller_job_completed2_history1
                 ],
                 'job': self.bilby_job_completed2
+            },
+            {
+                'user': self.user_1,
+                'history': [],
+                'job': self.uploaded_bilby_job1
             },
             {
                 'user': self.user_2,

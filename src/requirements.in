@@ -13,5 +13,6 @@ pyflakes
 flake8
 coverage<5
 bilby_pipe
+graphene_file_upload
 
 django-querycount

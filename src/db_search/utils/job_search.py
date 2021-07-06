@@ -5,6 +5,7 @@ from bilbyui.models import BilbyJob
 from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
+import db_search.utils.isms.bilby
 
 sql_term_search = """
 SELECT
@@ -83,10 +84,12 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states,
 
     :return: A list of job IDs representing the matched jobs
     """
-    # Get the correct job model name for bilby
+    # Get the correct job model name and SQL query for bilby
+    sql_query = sql_term_search
     job_model_name = application
     if application == 'bilbyui':
         job_model_name = 'bilby'
+        sql_query = db_search.utils.isms.bilby.sql_term_search
 
     # We need to use the correct database names for testing
     if settings.TESTING:
@@ -116,7 +119,7 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states,
             }
 
     # Format the database query
-    sql_term_search_prepared = sql_term_search.format_map(db_dict)
+    sql_term_search_prepared = sql_query.format_map(db_dict)
 
     # Process the query for this term
     qs = job_klass.objects.using(application).raw(
@@ -204,12 +207,12 @@ def job_search(application, terms, end_time, order_by, first, count, exclude_lig
     if count:
         jobs = jobs[:count]
 
-    # Store the jobs in a dictionary by job id
-    jobs = {job.job_controller_id: job for job in jobs}
+    # Generate a set of job controller job ids to look up histories for
+    job_controller_ids = set([job.job_controller_id for job in jobs])
 
     # Get the list of user ids to fetch
     users = set()
-    for job in jobs.values():
+    for job in jobs:
         users.add(job.user_id)
 
     # Get users and add them to a dictionary by user id
@@ -217,20 +220,20 @@ def job_search(application, terms, end_time, order_by, first, count, exclude_lig
     users = {user.id: user for user in users}
 
     # Get the job histories for the jobs found
-    tmp_histories = JobHistory.objects.using('jobserver').filter(job_id__in=jobs.keys()).order_by('-timestamp')
+    tmp_histories = JobHistory.objects.using('jobserver').filter(job_id__in=job_controller_ids).order_by('-timestamp')
 
     # Organise the job histories by job id
-    histories = {job_id: [] for job_id in jobs.keys()}
+    histories = {job_id: [] for job_id in job_controller_ids}
 
     for history in tmp_histories:
         histories[history.job_id].append(history)
 
     # Compile the results
     result = []
-    for job_id, job in jobs.items():
+    for job in jobs:
         result.append({
             'user': users[job.user_id],
-            'history': histories[job_id],
+            'history': histories[job.job_controller_id],
             'job': job
         })
 
