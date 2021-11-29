@@ -404,6 +404,42 @@ class TestSearch(SimpleTestCase):
 
         self.job_controller_job_incomplete_history2.delete()
 
+        # Test that uploaded jobs older than the end time don't show up in the history
+        self.uploaded_bilby_job1.creation_time -= datetime.timedelta(days=1)
+        self.uploaded_bilby_job2.creation_time -= datetime.timedelta(days=1)
+
+        self.uploaded_bilby_job1.save()
+        self.uploaded_bilby_job2.save()
+
+        expected = [
+            {
+                'user': self.user_1,
+                'history': [
+                    self.job_controller_job_completed_history1
+                ],
+                'job': self.bilby_job_completed
+            },
+            {
+                'user': self.user_2,
+                'history': [
+                    self.job_controller_job_completed2_history3,
+                    self.job_controller_job_completed2_history2,
+                    self.job_controller_job_completed2_history1
+                ],
+                'job': self.bilby_job_completed2
+            },
+            {
+                'user': self.user_2,
+                'history': [
+                    self.job_controller_job_incomplete_history1
+                ],
+                'job': self.bilby_job_incomplete
+            }
+        ]
+
+        results = job_search('bilbyui', [], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(results, expected)
+
     def test_single_term(self):
         job_completed = {
             'user': self.user_1,

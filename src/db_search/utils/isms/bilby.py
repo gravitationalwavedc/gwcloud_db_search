@@ -63,7 +63,10 @@ WHERE
             )
             AND {job_table}.is_uploaded_job = FALSE
         )
-        OR {job_table}.is_uploaded_job = TRUE
+        OR (
+            {job_table}.is_uploaded_job = TRUE
+            AND {job_table}.creation_time >= %(end_time)s
+        )
     )
     AND {job_table}.private = FALSE
     AND {job_table}.is_ligo_job IN %(ligo_job_states)s

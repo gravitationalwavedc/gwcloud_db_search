@@ -7,7 +7,7 @@ COPY ./runserver.sh /runserver.sh
 RUN chmod +x /runserver.sh
 
 # Install dependencies
-RUN apt-get update && apt-get install -y python-virtualenv build-essential python3-dev default-libmysqlclient-dev
+RUN apt-get update && apt-get install -y python3-virtualenv build-essential python3-dev default-libmysqlclient-dev
 
 # Create python virtualenv
 RUN virtualenv -p python3 /src/venv
