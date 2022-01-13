@@ -31,6 +31,16 @@ WHERE
                         name LIKE %(term)s
                 )
         )
+        OR event_id_id IN (
+            SELECT
+                {event_id_table}.id
+            FROM
+                {event_id_table}
+            WHERE
+                event_id LIKE %(term)s
+                OR trigger_id LIKE %(term)s
+                OR nickname LIKE %(term)s
+        )
     )
     AND
     (

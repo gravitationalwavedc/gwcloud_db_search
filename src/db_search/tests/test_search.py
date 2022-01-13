@@ -4,7 +4,7 @@ from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from gwauth.models import GWCloudUser
 from jobserver.models import Job, JobHistory
-from bilbyui.models import BilbyJob, Label
+from bilbyui.models import BilbyJob, Label, EventID
 from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
@@ -25,6 +25,7 @@ class TestSearch(SimpleTestCase):
         JobHistory.objects.using('jobserver').all().delete()
         BilbyJob.objects.using('bilbyui').all().delete()
         Label.objects.using('bilbyui').all().delete()
+        EventID.objects.using('bilbyui').all().delete()
 
         # Insert users
         self.user_1 = GWCloudUser.objects.using('gwauth').create(
@@ -290,6 +291,33 @@ class TestSearch(SimpleTestCase):
 
         self.bilby_job_completed2.labels.add(self.label_production_run)
         self.bilby_job_completed2.labels.add(self.label_reviewed)
+
+        self.event_id_1 = EventID.objects.using('bilbyui').create(
+            event_id='GW123456_123456',
+            trigger_id='S111111a',
+            nickname='arbitrary_nickname'
+        )
+
+        self.event_id_2 = EventID.objects.using('bilbyui').create(
+            event_id='GW123456_654321',
+            trigger_id='S111222a',
+            nickname='arbitrary_string'
+        )
+
+        self.bilby_job_completed.event_id = self.event_id_1
+        self.bilby_job_completed.save()
+
+        self.bilby_job_completed2.event_id = self.event_id_2
+        self.bilby_job_completed2.save()
+
+        self.bilby_job_incomplete.event_id = self.event_id_1
+        self.bilby_job_incomplete.save()
+
+        self.uploaded_bilby_job1.event_id = self.event_id_1
+        self.uploaded_bilby_job1.save()
+
+        self.uploaded_bilby_job2.event_id = self.event_id_2
+        self.uploaded_bilby_job2.save()
 
     def test_no_terms(self):
         expected = [
@@ -673,6 +701,73 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
+        # Test event IDs
+        results = job_search('bilbyui', ['GW123456'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_completed2,
+                job_uploaded1,
+                job_uploaded2,
+                job_incomplete
+            ]
+        )
+
+        results = job_search('bilbyui', ['GW123456_123456'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_uploaded1,
+                job_incomplete
+            ]
+        )
+
+        results = job_search('bilbyui', ['S111'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_completed2,
+                job_uploaded1,
+                job_uploaded2,
+                job_incomplete
+            ]
+        )
+
+        results = job_search('bilbyui', ['S111111'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_uploaded1,
+                job_incomplete
+            ]
+        )
+
+        results = job_search('bilbyui', ['arbitrary_'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_completed2,
+                job_uploaded1,
+                job_uploaded2,
+                job_incomplete
+            ]
+        )
+
+        results = job_search('bilbyui', ['arbitrary_nickname'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed,
+                job_uploaded1,
+                job_incomplete
+            ]
+        )
+
         # Test non existent terms
         results = job_search('bilbyui', ['blue'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(
@@ -847,6 +942,42 @@ class TestSearch(SimpleTestCase):
 
         results = job_search('bilbyui',
                              ['purple', 'production', 'reviewed', 'test', 'bad'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(results, [])
+
+        # Test match event IDs
+        results = job_search('bilbyui', ['brown', 'GW123456_123456'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed
+            ]
+        )
+
+        results = job_search('bilbyui', ['purple', 'S111222a'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search('bilbyui', ['purple', 'S111222a'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_completed2
+            ]
+        )
+
+        results = job_search('bilbyui', ['uploaded', 'arbitrary_nickname'], end_time, None, 0, 20, False)
+        self.assertSequenceEqual(
+            results,
+            [
+                job_uploaded1
+            ]
+        )
+
+        results = job_search('bilbyui', ['GW123456_123456', 'GW123456_654321'], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, [])
 
     def test_single_term_viterbi(self):

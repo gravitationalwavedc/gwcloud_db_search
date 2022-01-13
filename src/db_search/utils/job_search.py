@@ -101,6 +101,8 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states,
                 'label_table': settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_label',
                 'job_label_table':
                     settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_{job_model_name}job_labels',
+                'event_id_table':
+                    settings.DATABASES[application]['TEST']['NAME'] + f'.{application}_eventid',
                 'application': application,
                 'job_model_name': job_model_name
             }
@@ -114,6 +116,8 @@ def job_search_single_term(application, job_klass, term, end_time, valid_states,
                 'label_table': settings.DATABASES[application]['NAME'] + f'.{application}_label',
                 'job_label_table':
                     settings.DATABASES[application]['NAME'] + f'.{application}_{job_model_name}job_labels',
+                'event_id_table':
+                    settings.DATABASES[application]['NAME'] + f'.{application}_eventid',
                 'application': application,
                 'job_model_name': job_model_name
             }
