@@ -203,7 +203,8 @@ def job_search(application, terms, end_time, order_by, first, count, exclude_lig
     # Next we filter by range count
     jobs = job_klass.objects.using(application).filter(id__in=jobs)
 
-    # Todo: Sort
+    # Sort the jobs by their creation time
+    jobs = jobs.order_by('-creation_time')
 
     if first:
         jobs = jobs[first:]
