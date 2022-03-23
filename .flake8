@@ -1,0 +1,8 @@
+[flake8]
+
+exclude = 
+    # Ignore venv
+    venv
+    apps
+
+max-line-length = 120
