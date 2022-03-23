@@ -3,10 +3,6 @@ default:
     name: mysql:latest
     entrypoint: ["/usr/bin/env"]
 
-  variables:
-    MYSQL_DATABASE: django
-    MYSQL_ROOT_PASSWORD: root 
-
   before_script:
     - apt -y update
     - apt -y install apt-utils
@@ -16,6 +12,11 @@ default:
 
 django-tests:
   stage: test
+
+  variables:
+    MYSQL_DATABASE: django
+    MYSQL_ROOT_PASSWORD: root 
+
   script:
     - cd src/
     - pip3 install -r requirements.txt
