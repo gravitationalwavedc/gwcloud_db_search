@@ -75,6 +75,8 @@ WSGI_APPLICATION = 'gw_db_search.wsgi.application'
 
 DATABASE_ROUTERS = ['db_search.utils.db_router.DBRouter']
 
+mysql_host = os.environ.get('MYSQL_HOST', 'localhost')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -83,7 +85,7 @@ DATABASES = {
     'gwauth': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_auth',
-        'HOST': 'localhost',
+        'HOST': mysql_host,
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
@@ -94,7 +96,7 @@ DATABASES = {
     'jobserver': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_jobcontroller',
-        'HOST': 'localhost',
+        'HOST': mysql_host,
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
@@ -105,7 +107,7 @@ DATABASES = {
     'bilbyui': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwcloud_bilby',
-        'HOST': 'localhost',
+        'HOST': mysql_host,
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
@@ -116,7 +118,7 @@ DATABASES = {
     'viterbi': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'gwlab_viterbi',
-        'HOST': 'localhost',
+        'HOST': mysql_host,
         'USER': 'root',
         'PORT': 3306,
         'PASSWORD': 'root',
