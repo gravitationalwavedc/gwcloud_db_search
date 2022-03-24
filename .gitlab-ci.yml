@@ -9,6 +9,7 @@ default:
     - wget https://pascalroeleven.nl/deb-pascalroeleven.gpg
     - apt-key add deb-pascalroeleven.gpg
     - echo "deb http://deb.pascalroeleven.nl/python3.8 buster-backports main" >> /etc/apt/sources.list
+    - apt -y update
     - apt -y install net-tools python3.8 python3.8-venv python3.8-dev
     - apt -y upgrade
 
