@@ -6,26 +6,27 @@
 #
 aniso8601==7.0.0
     # via graphene
-asgiref==3.4.1
+asgiref==3.5.0
     # via django
-astropy==5.0
+astropy==5.0.2
     # via
     #   bilby
+    #   bilby-pipe
     #   gwpy
     #   pesummary
-attrs==21.2.0
+attrs==21.4.0
     # via bilby
-bilby[gw]==1.1.4
+bilby[gw]==1.1.5
     # via bilby-pipe
-bilby-pipe==1.0.4
+bilby-pipe==1.0.5
     # via -r requirements.in
 certifi==2021.10.8
     # via requests
 cffi==1.15.0
     # via cryptography
-charset-normalizer==2.0.8
+charset-normalizer==2.0.12
     # via requests
-click==8.0.3
+click==8.0.4
     # via
     #   pip-tools
     #   pycondor
@@ -40,9 +41,11 @@ coverage==4.5.4
     # via -r requirements.in
 cryptography==3.3.1
     # via
+    #   igwn-auth-utils
     #   jwcrypto
     #   ligo-gracedb
     #   pyopenssl
+    #   scitokens
 cycler==0.11.0
     # via matplotlib
 deepdish==0.3.7
@@ -51,7 +54,7 @@ deprecated==1.2.13
     # via jwcrypto
 dill==0.3.4
     # via bilby
-django==3.2.9
+django==3.2.12
     # via
     #   -r requirements.in
     #   django-cors-headers
@@ -59,7 +62,7 @@ django==3.2.9
     #   django-graphql-jwt
     #   django-jenkins
     #   graphene-django
-django-cors-headers==3.10.0
+django-cors-headers==3.11.0
     # via -r requirements.in
 django-filter==21.1
     # via -r requirements.in
@@ -69,7 +72,7 @@ django-jenkins==0.110.0
     # via -r requirements.in
 django-querycount==0.7.0
     # via -r requirements.in
-dqsegdb2==1.0.1
+dqsegdb2==1.1.1
     # via gwpy
 dynesty==1.0.1
     # via
@@ -79,7 +82,7 @@ emcee==3.1.1
     # via bilby
 flake8==4.0.1
     # via -r requirements.in
-fonttools==4.28.2
+fonttools==4.31.2
     # via matplotlib
 future==0.18.2
     # via
@@ -101,15 +104,13 @@ graphql-core==2.3.2
     #   graphql-relay
 graphql-relay==2.0.1
     # via graphene
-gwdatafind==1.0.4
-    # via
-    #   dqsegdb2
-    #   gwpy
+gwdatafind==1.0.5
+    # via gwpy
 gwosc==0.6.1
     # via
     #   bilby-pipe
     #   gwpy
-gwpy==2.1.2
+gwpy==2.1.3
     # via
     #   bilby
     #   bilby-pipe
@@ -121,13 +122,15 @@ h5py==3.6.0
     #   pesummary
 idna==3.3
     # via requests
+igwn-auth-utils[requests]==0.2.0
+    # via dqsegdb2
 jinja2==3.0.3
     # via bilby-pipe
 jwcrypto==1.0
     # via python-jwt
-kiwisolver==1.3.2
+kiwisolver==1.4.0
     # via matplotlib
-lalsuite==7.1
+lalsuite==7.4
     # via
     #   bilby
     #   pesummary
@@ -145,13 +148,15 @@ ligo-segments==1.4.0
     #   python-ligo-lw
 ligotimegps==2.0.1
     # via gwpy
-lscsoft-glue==2.0.0
+lscsoft-glue==3.0.1
     # via
     #   lalsuite
     #   python-ligo-lw
 markupsafe==2.0.1
-    # via jinja2
-matplotlib==3.5.0
+    # via
+    #   -r requirements.in
+    #   jinja2
+matplotlib==3.5.1
     # via
     #   bilby
     #   bilby-pipe
@@ -165,9 +170,9 @@ mccabe==0.6.1
     # via flake8
 mock==4.0.3
     # via bilby
-numexpr==2.7.3
+numexpr==2.8.1
     # via tables
-numpy==1.21.4
+numpy==1.22.3
     # via
     #   astropy
     #   bilby
@@ -194,8 +199,10 @@ packaging==21.3
     # via
     #   astropy
     #   matplotlib
-    #   setuptools-scm
-pandas==1.3.4
+    #   numexpr
+    #   statsmodels
+    #   tables
+pandas==1.4.1
     # via
     #   bilby
     #   pesummary
@@ -207,13 +214,13 @@ pep517==0.12.0
     # via pip-tools
 pep8==1.7.1
     # via -r requirements.in
-pesummary==0.13.2
+pesummary==0.13.3
     # via bilby-pipe
-pillow==8.4.0
+pillow==9.0.1
     # via matplotlib
-pip-tools==6.4.0
+pip-tools==6.5.1
     # via -r requirements.in
-plotly==5.4.0
+plotly==5.6.0
     # via pesummary
 promise==2.3
     # via
@@ -232,20 +239,24 @@ pyflakes==2.4.0
     # via
     #   -r requirements.in
     #   flake8
-pygments==2.10.0
+pygments==2.11.2
     # via pesummary
 pyjwt==1.7.1
     # via
     #   -r requirements.in
     #   django-graphql-jwt
+    #   scitokens
 pyopenssl==21.0.0
     # via
+    #   -r requirements.in
     #   gwdatafind
     #   lscsoft-glue
-pyparsing==3.0.6
+pyparsing==3.0.7
     # via
     #   matplotlib
     #   packaging
+pyrxp==3.0.1
+    # via lscsoft-glue
 python-dateutil==2.8.2
     # via
     #   gwpy
@@ -253,11 +264,11 @@ python-dateutil==2.8.2
     #   matplotlib
     #   pandas
     #   python-ligo-lw
-python-jwt==3.3.1
+python-jwt==3.3.2
     # via -r requirements.in
 python-ligo-lw==1.7.1
     # via pesummary
-pytz==2021.3
+pytz==2022.1
     # via
     #   django
     #   pandas
@@ -265,14 +276,17 @@ pyyaml==6.0
     # via
     #   astropy
     #   python-ligo-lw
-requests==2.26.0
+requests==2.27.1
     # via
     #   -r requirements.in
     #   gwosc
+    #   igwn-auth-utils
     #   ligo-gracedb
 rx==1.6.1
     # via graphql-core
-scipy==1.7.3
+safe-netrc==1.0.0
+    # via igwn-auth-utils
+scipy==1.8.0
     # via
     #   bilby
     #   bilby-pipe
@@ -282,10 +296,10 @@ scipy==1.7.3
     #   lalsuite
     #   seaborn
     #   statsmodels
+scitokens==1.7.0
+    # via igwn-auth-utils
 seaborn==0.11.2
     # via pesummary
-setuptools-scm==6.3.2
-    # via matplotlib
 singledispatch==3.7.0
     # via graphene-django
 six==1.16.0
@@ -307,12 +321,13 @@ six==1.16.0
     #   pyopenssl
     #   python-dateutil
     #   python-ligo-lw
+    #   scitokens
     #   singledispatch
 sqlparse==0.4.2
     # via django
-statsmodels==0.13.1
+statsmodels==0.13.2
     # via pesummary
-tables==3.6.1
+tables==3.7.0
     # via
     #   bilby
     #   deepdish
@@ -321,22 +336,20 @@ tenacity==8.0.1
     # via plotly
 text-unidecode==1.3
     # via graphene-django
-tomli==1.2.2
-    # via
-    #   pep517
-    #   setuptools-scm
-tqdm==4.62.3
+tomli==2.0.1
+    # via pep517
+tqdm==4.63.1
     # via
     #   bilby
     #   bilby-pipe
     #   gwpy
     #   pesummary
     #   python-ligo-lw
-urllib3==1.26.7
+urllib3==1.26.9
     # via requests
-wheel==0.37.0
+wheel==0.37.1
     # via pip-tools
-wrapt==1.13.3
+wrapt==1.14.0
     # via deprecated
 
 # The following packages are considered to be unsafe in a requirements file:
