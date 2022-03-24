@@ -130,7 +130,7 @@ jwcrypto==1.0
     # via python-jwt
 kiwisolver==1.4.0
     # via matplotlib
-lalsuite==7.4
+lalsuite==7.3
     # via
     #   bilby
     #   pesummary
