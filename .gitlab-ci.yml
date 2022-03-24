@@ -15,7 +15,7 @@ default:
   before_script:
     - apt -y update
     - apt -y install apt-utils
-    - apt -y install net-tools python3.8 python3-pip git
+    - apt -y install net-tools python3.8 python3-pip git build-essential libssl-dev libmysqlclient-dev
     - apt -y upgrade
 
 
@@ -25,6 +25,7 @@ django-tests:
     - git submodule update --init --recursive
     - cd src/
     - pip3 install -r requirements.txt
+    - pip3 install mysqlclient
     - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
 
   artifacts:
