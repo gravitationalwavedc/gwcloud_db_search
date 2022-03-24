@@ -322,11 +322,21 @@ class TestSearch(SimpleTestCase):
     def test_no_terms(self):
         expected = [
             {
-                'user': self.user_1,
+                'user': self.user_2,
                 'history': [
-                    self.job_controller_job_completed_history1
+                    self.job_controller_job_incomplete_history1
                 ],
-                'job': self.bilby_job_completed
+                'job': self.bilby_job_incomplete
+            },
+            {
+                'user': self.user_1,
+                'history': [],
+                'job': self.uploaded_bilby_job2
+            },
+            {
+                'user': self.user_1,
+                'history': [],
+                'job': self.uploaded_bilby_job1
             },
             {
                 'user': self.user_2,
@@ -339,21 +349,11 @@ class TestSearch(SimpleTestCase):
             },
             {
                 'user': self.user_1,
-                'history': [],
-                'job': self.uploaded_bilby_job1
-            },
-            {
-                'user': self.user_1,
-                'history': [],
-                'job': self.uploaded_bilby_job2
-            },
-            {
-                'user': self.user_2,
                 'history': [
-                    self.job_controller_job_incomplete_history1
+                    self.job_controller_job_completed_history1
                 ],
-                'job': self.bilby_job_incomplete
-            }
+                'job': self.bilby_job_completed
+            },
         ]
 
         end_time = timezone.now() - datetime.timedelta(days=1)
@@ -390,27 +390,27 @@ class TestSearch(SimpleTestCase):
         results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
 
-        self.job_controller_job_completed_history1.timestamp = end_time - datetime.timedelta(seconds=1)
-        self.job_controller_job_completed_history1.save()
+        self.job_controller_job_incomplete_history1.timestamp = end_time - datetime.timedelta(seconds=1)
+        self.job_controller_job_incomplete_history1.save()
 
         results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected[1:])
 
-        self.job_controller_job_completed_history1.timestamp = timezone.now()
-        self.job_controller_job_completed_history1.save()
+        self.job_controller_job_incomplete_history1.timestamp = timezone.now()
+        self.job_controller_job_incomplete_history1.save()
 
         results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
 
         # Check private jobs are excluded
-        self.bilby_job_completed.private = True
-        self.bilby_job_completed.save()
+        self.bilby_job_incomplete.private = True
+        self.bilby_job_incomplete.save()
 
         results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected[1:])
 
-        self.bilby_job_completed.private = False
-        self.bilby_job_completed.save()
+        self.bilby_job_incomplete.private = False
+        self.bilby_job_incomplete.save()
 
         results = job_search('bilbyui', [], end_time, None, 0, 20, False)
         self.assertSequenceEqual(results, expected)
@@ -423,7 +423,7 @@ class TestSearch(SimpleTestCase):
             timestamp=timezone.now()
         )
 
-        expected[-1]['history'] = [
+        expected[0]['history'] = [
             self.job_controller_job_incomplete_history2,
             self.job_controller_job_incomplete_history1
         ]
@@ -441,11 +441,11 @@ class TestSearch(SimpleTestCase):
 
         expected = [
             {
-                'user': self.user_1,
+                'user': self.user_2,
                 'history': [
-                    self.job_controller_job_completed_history1
+                    self.job_controller_job_incomplete_history1
                 ],
-                'job': self.bilby_job_completed
+                'job': self.bilby_job_incomplete
             },
             {
                 'user': self.user_2,
@@ -457,11 +457,11 @@ class TestSearch(SimpleTestCase):
                 'job': self.bilby_job_completed2
             },
             {
-                'user': self.user_2,
+                'user': self.user_1,
                 'history': [
-                    self.job_controller_job_incomplete_history1
+                    self.job_controller_job_completed_history1
                 ],
-                'job': self.bilby_job_incomplete
+                'job': self.bilby_job_completed
             }
         ]
 
@@ -512,11 +512,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -525,9 +525,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
+                job_uploaded2,
                 job_uploaded1,
-                job_uploaded2
+                job_completed
             ]
         )
 
@@ -536,8 +536,8 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed2,
-                job_incomplete
+                job_incomplete,
+                job_completed2
             ]
         )
 
@@ -547,8 +547,8 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed2,
-                job_incomplete
+                job_incomplete,
+                job_completed2
             ]
         )
 
@@ -558,9 +558,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
+                job_uploaded2,
                 job_uploaded1,
-                job_uploaded2
+                job_completed
             ]
         )
 
@@ -569,8 +569,8 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed2,
-                job_incomplete
+                job_incomplete,
+                job_completed2
             ]
         )
 
@@ -580,11 +580,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -602,9 +602,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
+                job_incomplete,
                 job_uploaded1,
-                job_incomplete
+                job_completed
             ]
         )
 
@@ -638,11 +638,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -660,9 +660,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
+                job_incomplete,
                 job_uploaded1,
-                job_incomplete
+                job_completed
             ]
         )
 
@@ -687,8 +687,8 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_incomplete
+                job_incomplete,
+                job_completed
             ]
         )
 
@@ -696,8 +696,8 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -706,11 +706,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -718,9 +718,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
+                job_incomplete,
                 job_uploaded1,
-                job_incomplete
+                job_completed
             ]
         )
 
@@ -728,11 +728,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -740,9 +740,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
+                job_incomplete,
                 job_uploaded1,
-                job_incomplete
+                job_completed
             ]
         )
 
@@ -750,11 +750,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -762,9 +762,9 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
+                job_incomplete,
                 job_uploaded1,
-                job_incomplete
+                job_completed
             ]
         )
 
@@ -823,11 +823,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed
             ]
         )
 
@@ -840,11 +840,11 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_completed2,
-                job_uploaded1,
+                job_incomplete,
                 job_uploaded2,
-                job_incomplete
+                job_uploaded1,
+                job_completed2,
+                job_completed,
             ]
         )
 
@@ -899,8 +899,8 @@ class TestSearch(SimpleTestCase):
         self.assertSequenceEqual(
             results,
             [
-                job_completed,
-                job_incomplete
+                job_incomplete,
+                job_completed
             ]
         )
 
@@ -1007,11 +1007,9 @@ class TestSearch(SimpleTestCase):
             {
                 'user': self.user_2,
                 'history': [
-                    self.job_controller_job_completed2_history3,
-                    self.job_controller_job_completed2_history2,
-                    self.job_controller_job_completed2_history1
+                    self.job_controller_job_incomplete_history1
                 ],
-                'job': self.bilby_job_completed2
+                'job': self.bilby_job_incomplete
             },
             {
                 'user': self.user_1,
@@ -1021,9 +1019,11 @@ class TestSearch(SimpleTestCase):
             {
                 'user': self.user_2,
                 'history': [
-                    self.job_controller_job_incomplete_history1
+                    self.job_controller_job_completed2_history3,
+                    self.job_controller_job_completed2_history2,
+                    self.job_controller_job_completed2_history1
                 ],
-                'job': self.bilby_job_incomplete
+                'job': self.bilby_job_completed2
             }
         ]
 

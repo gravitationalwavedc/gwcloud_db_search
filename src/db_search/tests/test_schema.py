@@ -471,9 +471,9 @@ class TestQueriesCustom(CustomJwtTestCase):
         # Test default time (1d)
         run_default({
             'publicBilbyJobs': [
-                self.bilby_job_completed_result,
+                self.bilby_job_incomplete_result,
                 self.bilby_job_completed2_result,
-                self.bilby_job_incomplete_result
+                self.bilby_job_completed_result
             ]
         })
 
@@ -486,9 +486,9 @@ class TestQueriesCustom(CustomJwtTestCase):
 
         run_default({
             'publicBilbyJobs': [
-                self.bilby_job_completed_result,
+                self.bilby_job_incomplete_result,
                 self.bilby_job_completed2_result,
-                self.bilby_job_incomplete_result
+                self.bilby_job_completed_result,
             ]
         })
 
@@ -500,10 +500,10 @@ class TestQueriesCustom(CustomJwtTestCase):
 
         run_default({
             'publicBilbyJobs': [
-                self.bilby_job_completed_result,
-                self.bilby_job_completed2_result,
+                self.bilby_job_completed_result_old,
                 self.bilby_job_incomplete_result,
-                self.bilby_job_completed_result_old
+                self.bilby_job_completed2_result,
+                self.bilby_job_completed_result
             ]
         })
 
@@ -557,9 +557,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1d',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
+                    self.bilby_job_incomplete_result,
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -574,10 +574,10 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1d',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
-                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result_old,
                     self.bilby_job_incomplete_result,
-                    self.bilby_job_completed_result_old
+                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -593,9 +593,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1w',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
+                    self.bilby_job_incomplete_result,
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -610,10 +610,10 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1w',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
-                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result_old,
                     self.bilby_job_incomplete_result,
-                    self.bilby_job_completed_result_old
+                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -629,9 +629,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1m',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
+                    self.bilby_job_incomplete_result,
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -646,10 +646,10 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1m',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
-                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result_old,
                     self.bilby_job_incomplete_result,
-                    self.bilby_job_completed_result_old
+                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -665,9 +665,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1y',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
+                    self.bilby_job_incomplete_result,
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -682,10 +682,10 @@ class TestQueriesCustom(CustomJwtTestCase):
             '1y',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
-                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result_old,
                     self.bilby_job_incomplete_result,
-                    self.bilby_job_completed_result_old
+                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -701,10 +701,10 @@ class TestQueriesCustom(CustomJwtTestCase):
             '',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
-                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result_old,
                     self.bilby_job_incomplete_result,
-                    self.bilby_job_completed_result_old
+                    self.bilby_job_completed2_result,
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -801,8 +801,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             'yellow',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_incomplete_result,
+                    self.bilby_job_completed2_result
                 ]
             }
         )
@@ -820,9 +820,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
+                    self.bilby_job_incomplete_result,
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result,
                 ]
             }
         )
@@ -841,8 +841,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user yellow',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_incomplete_result,
+                    self.bilby_job_completed2_result
                 ]
             }
         )
@@ -851,8 +851,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user yellow',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_incomplete_result,
+                    self.bilby_job_completed2_result
                 ]
             }
         )
@@ -861,8 +861,8 @@ class TestQueriesCustom(CustomJwtTestCase):
             'user yellow test',
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_incomplete_result,
+                    self.bilby_job_completed2_result
                 ]
             }
         )
@@ -1016,7 +1016,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             {
                 'publicBilbyJobs': [
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -1033,7 +1033,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             1,
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
+                    self.bilby_job_incomplete_result,
                 ]
             }
         )
@@ -1042,9 +1042,9 @@ class TestQueriesCustom(CustomJwtTestCase):
             1000,
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed_result,
+                    self.bilby_job_incomplete_result,
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -1063,7 +1063,7 @@ class TestQueriesCustom(CustomJwtTestCase):
             {
                 'publicBilbyJobs': [
                     self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_completed_result
                 ]
             }
         )
@@ -1111,8 +1111,8 @@ class TestQueriesCustom(CustomJwtTestCase):
         run_bilby_exclude_ligo(
             {
                 'publicBilbyJobs': [
-                    self.bilby_job_completed2_result,
-                    self.bilby_job_incomplete_result
+                    self.bilby_job_incomplete_result,
+                    self.bilby_job_completed2_result
                 ]
             }
         )
