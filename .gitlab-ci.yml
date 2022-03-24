@@ -5,6 +5,7 @@ services:
 variables:
   MYSQL_DATABASE: "django"
   MYSQL_ROOT_PASSWORD: "root"
+  MYSQL_HOST: "mysql"
 
 
 default:
@@ -26,7 +27,7 @@ django-tests:
     - cd src/
     - pip3 install -r requirements.txt
     - pip3 install mysqlclient
-    - MYSQL_HOST=mysql python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
+    - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
 
   artifacts:
     reports:
