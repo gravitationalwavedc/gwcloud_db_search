@@ -26,7 +26,7 @@ django-tests:
     - cd src/
     - pip3 install -r requirements.txt
     - pip3 install mysqlclient
-    - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
+    - MYSQL_HOST=mysql python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
 
   artifacts:
     reports:
