@@ -4,7 +4,8 @@ from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
 from gwauth.models import GWCloudUser
 from jobserver.models import Job, JobHistory
-from bilbyui.models import BilbyJob, Label, EventID
+from bilbyui.models import BilbyJob, Label, EventID, IniKeyValue
+from bilbyui.tests.test_utils import create_test_ini_string
 from viterbi.models import ViterbiJob
 
 from db_search.status import JobStatus
@@ -24,6 +25,7 @@ class TestSearch(SimpleTestCase):
         Job.objects.using('jobserver').all().delete()
         JobHistory.objects.using('jobserver').all().delete()
         BilbyJob.objects.using('bilbyui').all().delete()
+        IniKeyValue.objects.using('bilbyui').all().delete()
         Label.objects.using('bilbyui').all().delete()
         EventID.objects.using('bilbyui').all().delete()
 
@@ -65,7 +67,7 @@ class TestSearch(SimpleTestCase):
             name="test_job",
             description="my potato job is brown",
             private=False,
-            is_ligo_job=True
+            ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 0})
         )
 
         # Completed job 2
@@ -100,7 +102,8 @@ class TestSearch(SimpleTestCase):
             job_controller_id=self.job_controller_job_completed2.id,
             name="test_job_purple",
             description="this job is actually cyan",
-            private=False
+            private=False,
+            ini_string=create_test_ini_string({'trigger-time': 1.0, 'n-simulation': 0})
         )
 
         # Uploaded bilby job
@@ -110,7 +113,8 @@ class TestSearch(SimpleTestCase):
             name="test_job_uploaded",
             description="my potato job is magenta",
             private=False,
-            is_uploaded_job=True
+            is_uploaded_job=True,
+            ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 0})
         )
 
         self.uploaded_bilby_job2 = BilbyJob.objects.using('bilbyui').create(
@@ -120,7 +124,7 @@ class TestSearch(SimpleTestCase):
             description="my grape job is fermented",
             private=False,
             is_uploaded_job=True,
-            is_ligo_job=True
+            ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 1})
         )
 
         # Incomplete job
@@ -143,7 +147,8 @@ class TestSearch(SimpleTestCase):
             job_controller_id=self.job_controller_job_incomplete.id,
             name="test_job_incomplete",
             description="my potato job is violet",
-            private=False
+            private=False,
+            ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 1})
         )
 
         # Errored Job
@@ -178,7 +183,8 @@ class TestSearch(SimpleTestCase):
             job_controller_id=self.job_controller_job_error.id,
             name="test_job_error",
             description="This job is also violet - but is an error so should never show up",
-            private=False
+            private=False,
+            ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 1})
         )
 
         # Errored Job
@@ -237,7 +243,8 @@ class TestSearch(SimpleTestCase):
             job_controller_id=self.job_controller_job_error.id,
             name="test_job_error_GWOSC",
             description="my potato job is another errored job but let's call this one magenta",
-            private=False
+            private=False,
+            ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 1})
         )
 
         self.job_controller_job_completed_viterbi = Job.objects.using('jobserver').create(
@@ -1002,6 +1009,7 @@ class TestSearch(SimpleTestCase):
             ]
         )
 
+    @override_settings(EMBARGO_START_TIME=1.5)
     def test_exclude_ligo_jobs(self):
         expected = [
             {
@@ -1014,7 +1022,7 @@ class TestSearch(SimpleTestCase):
             {
                 'user': self.user_1,
                 'history': [],
-                'job': self.uploaded_bilby_job1
+                'job': self.uploaded_bilby_job2
             },
             {
                 'user': self.user_2,

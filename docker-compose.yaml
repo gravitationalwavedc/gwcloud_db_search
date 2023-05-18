@@ -5,7 +5,7 @@ services:
     build:
       dockerfile: ./docker/gwcloud_db_search.Dockerfile
       context: .
-    image: nexus.gwdc.org.au/docker/gwcloud_db_search:0.11
+    image: nexus.gwdc.org.au/docker/gwcloud_db_search:0.12
     container_name: gwcloud_db_search
     ports:
       - "8000"

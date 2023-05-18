@@ -208,3 +208,5 @@ TESTING = False
 
 # The maximum number of results to return from the graphql endpoint
 GRAPHENE_RESULTS_LIMIT = 100
+
+EMBARGO_START_TIME = None
