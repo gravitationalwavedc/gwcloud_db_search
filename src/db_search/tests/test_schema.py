@@ -1173,6 +1173,9 @@ class TestQueriesCustom(CustomJwtTestCase):
         self.bilby_job_incomplete_result['job']['creationTime'] = \
             graphene.DateTime().serialize(self.bilby_job_incomplete.creation_time)
 
+        self.bilby_job_incomplete_result['job']['lastUpdated'] = \
+            graphene.DateTime().serialize(self.bilby_job_incomplete.last_updated)
+
         fetch_jobs({
             'publicBilbyJobs': [
                 self.bilby_job_completed2_result,

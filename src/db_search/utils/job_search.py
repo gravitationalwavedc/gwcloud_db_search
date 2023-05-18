@@ -4,6 +4,8 @@ from jobserver.models import JobHistory
 from bilbyui.models import BilbyJob
 from viterbi.models import ViterbiJob
 
+from bilbyui.utils.embargo import qs_embargo_filter
+
 from db_search.status import JobStatus
 import db_search.utils.isms.bilby
 
@@ -202,6 +204,10 @@ def job_search(application, terms, end_time, order_by, first, count, exclude_lig
 
     # Next we filter by range count
     jobs = job_klass.objects.using(application).filter(id__in=jobs)
+
+    if job_klass is BilbyJob and exclude_ligo_jobs:
+        # Checking that EMBARGO_START_TIME is not None shouldn't be necessary, it should be handled by exclude_ligo_jobs
+        jobs = qs_embargo_filter(jobs) if settings.EMBARGO_START_TIME is not None else jobs
 
     # Sort the jobs by their creation time
     jobs = jobs.order_by('-creation_time')

@@ -6,6 +6,8 @@ MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 
 SECRET_KEY = os.getenv('DB_SEARCH_SECRET_KEY', 'super_secret')
 
+EMBARGO_START_TIME = os.getenv('EMBARGO_START_TIME')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
