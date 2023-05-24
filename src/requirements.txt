@@ -42,8 +42,9 @@ configargparse==1.5.3
     # via bilby-pipe
 contourpy==1.0.7
     # via matplotlib
-corner==2.2.2
+corner==2.2.1
     # via
+    #   -r requirements.in
     #   bilby
     #   bilby-pipe
     #   pesummary

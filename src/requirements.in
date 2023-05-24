@@ -16,5 +16,6 @@ bilby_pipe
 graphene_file_upload
 pyopenssl<22
 astropy<5.3
+corner<2.2.2
 
 django-querycount
