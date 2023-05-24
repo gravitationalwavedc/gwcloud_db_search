@@ -17,7 +17,7 @@ default:
     - apt -y update
     - apt -y install apt-utils software-properties-common
     - add-apt-repository --yes ppa:deadsnakes/ppa
-    - apt -y install net-tools python3.9 git build-essential libssl-dev libmysqlclient-dev
+    - apt -y install net-tools python3.9 python3.9-venv git build-essential libssl-dev libmysqlclient-dev
     - apt -y upgrade
 
 
@@ -26,9 +26,9 @@ django-tests:
   script:
     - git submodule update --init --recursive
     - cd src/
-    - pip3 install -r requirements.txt
-    - pip3 install mysqlclient
-    - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
+    - python3.9 -m pip install -r requirements.txt
+    - python3.9 -m pip install mysqlclient
+    - python3.9 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
 
   artifacts:
     reports:
@@ -59,7 +59,7 @@ code-quality:
 
 flake8:
   script:
-    - pip3 install flake8-gl-codeclimate
+    - python3.9 -m pip install flake8-gl-codeclimate
     - flake8 --exit-zero --format gl-codeclimate --output-file gl-code-quality-report.json src/
   artifacts:
     reports:
