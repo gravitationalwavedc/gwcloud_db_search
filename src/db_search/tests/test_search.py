@@ -2,6 +2,8 @@ import datetime
 
 from django.test import SimpleTestCase, override_settings
 from django.utils import timezone
+
+from bilbyui.constants import BilbyJobType
 from gwauth.models import GWCloudUser
 from jobserver.models import Job, JobHistory
 from bilbyui.models import BilbyJob, Label, EventID, IniKeyValue
