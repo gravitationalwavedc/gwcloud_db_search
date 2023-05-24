@@ -113,7 +113,7 @@ class TestSearch(SimpleTestCase):
             name="test_job_uploaded",
             description="my potato job is magenta",
             private=False,
-            is_uploaded_job=True,
+            job_type=BilbyJobType.UPLOADED,
             ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 0})
         )
 
@@ -123,7 +123,7 @@ class TestSearch(SimpleTestCase):
             name="test_job_uploaded2",
             description="my grape job is fermented",
             private=False,
-            is_uploaded_job=True,
+            job_type=BilbyJobType.UPLOADED,
             ini_string=create_test_ini_string({'trigger-time': 2.0, 'n-simulation': 1})
         )
 
