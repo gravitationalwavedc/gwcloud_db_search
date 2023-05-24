@@ -71,10 +71,10 @@ WHERE
                     ) in %(valid_states)s
                     AND application = %(application)s
             )
-            AND {job_table}.is_uploaded_job = FALSE
+            AND {job_table}.job_type = 0
         )
         OR (
-            {job_table}.is_uploaded_job = TRUE
+            {job_table}.job_type IN (1, 2)
             AND {job_table}.creation_time >= %(end_time)s
         )
     )
