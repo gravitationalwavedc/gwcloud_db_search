@@ -26,8 +26,8 @@ django-tests:
   script:
     - git submodule update --init --recursive
     - cd src/
-    - pip3.9 install -r requirements.txt
-    - pip3.9 install mysqlclient
+    - pip3 install -r requirements.txt
+    - pip3 install mysqlclient
     - python3 development-manage.py jenkins --enable-coverage --coverage-rcfile=.coveragerc
 
   artifacts:
