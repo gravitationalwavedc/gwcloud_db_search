@@ -8,8 +8,9 @@ aniso8601==7.0.0
     # via graphene
 asgiref==3.7.0
     # via django
-astropy==5.3
+astropy==5.2.2
     # via
+    #   -r requirements.in
     #   bilby
     #   bilby-pipe
     #   gwpy

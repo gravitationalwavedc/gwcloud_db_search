@@ -15,5 +15,6 @@ coverage<5
 bilby_pipe
 graphene_file_upload
 pyopenssl<22
+astropy<5.3
 
 django-querycount
